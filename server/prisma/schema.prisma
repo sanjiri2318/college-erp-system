@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  FACULTY
+  STUDENT
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  role         Role
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  student Student?
+  faculty Faculty?
+}
+
+model Department {
+  id       Int      @id @default(autoincrement())
+  name     String
+  code     String   @unique
+
+  students Student[]
+  faculty  Faculty[]
+  subjects Subject[]
+}
+
+model Student {
+  id            Int    @id @default(autoincrement())
+  regNumber     String @unique
+  name          String
+  semester      Int
+  phone         String?
+
+  userId        Int @unique
+  departmentId  Int
+
+  user          User       @relation(fields: [userId], references: [id])
+  department    Department @relation(fields: [departmentId], references: [id])
+
+  attendances Attendance[]
+  marks       InternalMark[]
+}
+
+model Faculty {
+  id           Int    @id @default(autoincrement())
+  empId        String @unique
+  name         String
+
+  userId       Int @unique
+  departmentId Int
+
+  user         User       @relation(fields: [userId], references: [id])
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  subjects     Subject[]
+}
+
+model Subject {
+  id           Int    @id @default(autoincrement())
+  code         String @unique
+  name         String
+  semester     Int
+
+  departmentId Int
+  facultyId    Int?
+
+  department   Department @relation(fields: [departmentId], references: [id])
+  faculty      Faculty?   @relation(fields: [facultyId], references: [id])
+
+  attendances Attendance[]
+  marks       InternalMark[]
+}
+
+model Attendance {
+  id         Int      @id @default(autoincrement())
+  date       DateTime
+
+  studentId  Int
+  subjectId  Int
+
+  student    Student  @relation(fields: [studentId], references: [id])
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+}
+
+model InternalMark {
+  id            Int @id @default(autoincrement())
+  internalNumber Int
+  marksObtained Float
+
+  studentId Int
+  subjectId Int
+
+  student   Student @relation(fields: [studentId], references: [id])
+  subject   Subject @relation(fields: [subjectId], references: [id])
+}
