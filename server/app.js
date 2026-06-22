@@ -30,8 +30,10 @@ app.get('/api/health', (req, res) => {
 // ── Routes ─────────────────────────────────────────────────────────────────
 
 const authRoutes = require('./src/routes/auth.routes');
+const departmentRoutes = require('./src/routes/department.routes');
 
 app.use('/api/auth', authRoutes);
+app.use('/api/departments', departmentRoutes);
 
 // ── 404 Handler ────────────────────────────────────────────────────────────
 
