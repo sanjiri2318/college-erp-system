@@ -32,10 +32,12 @@ app.get('/api/health', (req, res) => {
 const authRoutes = require('./src/routes/auth.routes');
 const departmentRoutes = require('./src/routes/department.routes');
 const studentRoutes = require('./src/routes/student.routes');
+const facultyRoutes = require('./src/routes/faculty.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/faculty', facultyRoutes);
 
 // ── 404 Handler ────────────────────────────────────────────────────────────
 
