@@ -24,11 +24,178 @@ const {
 // All routes require authentication
 router.use(verifyToken);
 
-// Faculty APIs
-router.post('/', requireRole('ADMIN'), createFaculty);
-router.get('/', requireRole('ADMIN', 'FACULTY'), getAllFaculty);
-router.get('/:id', requireRole('ADMIN', 'FACULTY'), getFacultyById);
-router.put('/:id', requireRole('ADMIN'), updateFaculty);
-router.delete('/:id', requireRole('ADMIN'), deleteFaculty);
+/**
+ * @openapi
+ * tags:
+ *   - name: Faculty
+ *     description: Faculty Management APIs
+ */
+
+/**
+ * @openapi
+ * /api/faculty:
+ *   post:
+ *     summary: Create a new faculty member
+ *     tags: [Faculty]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - empId
+ *               - name
+ *               - userId
+ *               - departmentId
+ *             properties:
+ *               empId:
+ *                 type: string
+ *                 example: EMP001
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               userId:
+ *                 type: integer
+ *                 example: 4
+ *               departmentId:
+ *                 type: integer
+ *                 example: 2
+ *     responses:
+ *       201:
+ *         description: Faculty created successfully
+ *       400:
+ *         description: Validation error
+ *       403:
+ *         description: Access denied
+ */
+router.post(
+  '/',
+  requireRole('ADMIN'),
+  createFaculty
+);
+
+/**
+ * @openapi
+ * /api/faculty:
+ *   get:
+ *     summary: Get all faculty members
+ *     tags: [Faculty]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of faculty members
+ *       403:
+ *         description: Access denied
+ */
+router.get(
+  '/',
+  requireRole('ADMIN', 'FACULTY'),
+  getAllFaculty
+);
+
+/**
+ * @openapi
+ * /api/faculty/{id}:
+ *   get:
+ *     summary: Get faculty by ID
+ *     tags: [Faculty]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Faculty ID
+ *     responses:
+ *       200:
+ *         description: Faculty details
+ *       404:
+ *         description: Faculty not found
+ */
+router.get(
+  '/:id',
+  requireRole('ADMIN', 'FACULTY'),
+  getFacultyById
+);
+
+/**
+ * @openapi
+ * /api/faculty/{id}:
+ *   put:
+ *     summary: Update faculty details
+ *     tags: [Faculty]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Faculty ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               empId:
+ *                 type: string
+ *                 example: EMP001
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               departmentId:
+ *                 type: integer
+ *                 example: 2
+ *     responses:
+ *       200:
+ *         description: Faculty updated successfully
+ *       404:
+ *         description: Faculty not found
+ *       403:
+ *         description: Access denied
+ */
+router.put(
+  '/:id',
+  requireRole('ADMIN'),
+  updateFaculty
+);
+
+/**
+ * @openapi
+ * /api/faculty/{id}:
+ *   delete:
+ *     summary: Delete faculty
+ *     tags: [Faculty]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Faculty ID
+ *     responses:
+ *       200:
+ *         description: Faculty deleted successfully
+ *       404:
+ *         description: Faculty not found
+ *       403:
+ *         description: Access denied
+ */
+router.delete(
+  '/:id',
+  requireRole('ADMIN'),
+  deleteFaculty
+);
 
 module.exports = router;

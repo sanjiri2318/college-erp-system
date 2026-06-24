@@ -1,8 +1,10 @@
 // Express application setup
-// Registers middleware, routes, and global error handler
+// Registers middleware, routes, Swagger docs, and global error handler
 
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger');
 
 const app = express();
 
@@ -27,19 +29,35 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ── Routes ─────────────────────────────────────────────────────────────────
+// ── Swagger Documentation ─────────────────────────────────────────────────
+
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
+);
+
+// ── Routes ────────────────────────────────────────────────────────────────
 
 const authRoutes = require('./src/routes/auth.routes');
 const departmentRoutes = require('./src/routes/department.routes');
 const studentRoutes = require('./src/routes/student.routes');
 const facultyRoutes = require('./src/routes/faculty.routes');
+const subjectRoutes = require('./src/routes/subject.routes');
+const attendanceRoutes = require('./src/routes/attendance.routes');
+const internalMarkRoutes = require('./src/routes/internalMark.routes');
+const dashboardRoutes = require('./src/routes/dashboard.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/faculty', facultyRoutes);
+app.use('/api/subjects', subjectRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/internal-marks', internalMarkRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
-// ── 404 Handler ────────────────────────────────────────────────────────────
+// ── 404 Handler ───────────────────────────────────────────────────────────
 
 app.use((req, res) => {
   res.status(404).json({
@@ -48,7 +66,7 @@ app.use((req, res) => {
   });
 });
 
-// ── Global Error Handler ───────────────────────────────────────────────────
+// ── Global Error Handler ──────────────────────────────────────────────────
 
 app.use((err, req, res, next) => {
   console.error('[ERROR]', err);

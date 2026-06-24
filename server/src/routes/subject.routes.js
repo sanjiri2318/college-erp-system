@@ -1,42 +1,42 @@
-// Student routes
-// POST   /api/students       → ADMIN only
-// GET    /api/students       → ADMIN, FACULTY
-// GET    /api/students/:id   → ADMIN, FACULTY
-// PUT    /api/students/:id   → ADMIN only
-// DELETE /api/students/:id   → ADMIN only
+// Subject routes
+// POST   /api/subjects       → ADMIN only
+// GET    /api/subjects       → ADMIN, FACULTY
+// GET    /api/subjects/:id   → ADMIN, FACULTY
+// PUT    /api/subjects/:id   → ADMIN only
+// DELETE /api/subjects/:id   → ADMIN only
 
 const express = require('express');
 const router = express.Router();
 
 const {
-  createStudent,
-  getAllStudents,
-  getStudentById,
-  updateStudent,
-  deleteStudent,
-} = require('../controllers/student.controller');
+  createSubject,
+  getAllSubjects,
+  getSubjectById,
+  updateSubject,
+  deleteSubject,
+} = require('../controllers/subject.controller');
 
 const {
   verifyToken,
   requireRole,
 } = require('../middlewares/auth.middleware');
 
-// All routes require authentication
+// All routes require a valid token
 router.use(verifyToken);
 
 /**
  * @openapi
  * tags:
- *   - name: Students
- *     description: Student Management APIs
+ *   - name: Subjects
+ *     description: Subject Management APIs
  */
 
 /**
  * @openapi
- * /api/students:
+ * /api/subjects:
  *   post:
- *     summary: Create a new student
- *     tags: [Students]
+ *     summary: Create a new subject
+ *     tags: [Subjects]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -46,33 +46,29 @@ router.use(verifyToken);
  *           schema:
  *             type: object
  *             required:
- *               - regNumber
+ *               - code
  *               - name
  *               - semester
- *               - userId
  *               - departmentId
  *             properties:
- *               regNumber:
+ *               code:
  *                 type: string
- *                 example: RA2211003010001
+ *                 example: CSE301
  *               name:
  *                 type: string
- *                 example: Arun Kumar
+ *                 example: Database Management Systems
  *               semester:
- *                 type: integer
- *                 example: 5
- *               phone:
- *                 type: string
- *                 example: "9876543210"
- *               userId:
  *                 type: integer
  *                 example: 5
  *               departmentId:
  *                 type: integer
+ *                 example: 1
+ *               facultyId:
+ *                 type: integer
  *                 example: 2
  *     responses:
  *       201:
- *         description: Student created successfully
+ *         description: Subject created successfully
  *       400:
  *         description: Validation error
  *       403:
@@ -81,35 +77,35 @@ router.use(verifyToken);
 router.post(
   '/',
   requireRole('ADMIN'),
-  createStudent
+  createSubject
 );
 
 /**
  * @openapi
- * /api/students:
+ * /api/subjects:
  *   get:
- *     summary: Get all students
- *     tags: [Students]
+ *     summary: Get all subjects
+ *     tags: [Subjects]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of students
+ *         description: List of subjects
  *       403:
  *         description: Access denied
  */
 router.get(
   '/',
   requireRole('ADMIN', 'FACULTY'),
-  getAllStudents
+  getAllSubjects
 );
 
 /**
  * @openapi
- * /api/students/{id}:
+ * /api/subjects/{id}:
  *   get:
- *     summary: Get student by ID
- *     tags: [Students]
+ *     summary: Get subject by ID
+ *     tags: [Subjects]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -118,25 +114,25 @@ router.get(
  *         required: true
  *         schema:
  *           type: integer
- *         description: Student ID
+ *         description: Subject ID
  *     responses:
  *       200:
- *         description: Student details
+ *         description: Subject details
  *       404:
- *         description: Student not found
+ *         description: Subject not found
  */
 router.get(
   '/:id',
   requireRole('ADMIN', 'FACULTY'),
-  getStudentById
+  getSubjectById
 );
 
 /**
  * @openapi
- * /api/students/{id}:
+ * /api/subjects/{id}:
  *   put:
- *     summary: Update student details
- *     tags: [Students]
+ *     summary: Update subject details
+ *     tags: [Subjects]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -145,7 +141,7 @@ router.get(
  *         required: true
  *         schema:
  *           type: integer
- *         description: Student ID
+ *         description: Subject ID
  *     requestBody:
  *       required: true
  *       content:
@@ -153,41 +149,41 @@ router.get(
  *           schema:
  *             type: object
  *             properties:
- *               regNumber:
+ *               code:
  *                 type: string
- *                 example: RA2211003010001
+ *                 example: CSE301
  *               name:
  *                 type: string
- *                 example: Arun Kumar
+ *                 example: Database Management Systems
  *               semester:
  *                 type: integer
  *                 example: 5
- *               phone:
- *                 type: string
- *                 example: "9876543210"
  *               departmentId:
+ *                 type: integer
+ *                 example: 1
+ *               facultyId:
  *                 type: integer
  *                 example: 2
  *     responses:
  *       200:
- *         description: Student updated successfully
+ *         description: Subject updated successfully
  *       404:
- *         description: Student not found
+ *         description: Subject not found
  *       403:
  *         description: Access denied
  */
 router.put(
   '/:id',
   requireRole('ADMIN'),
-  updateStudent
+  updateSubject
 );
 
 /**
  * @openapi
- * /api/students/{id}:
+ * /api/subjects/{id}:
  *   delete:
- *     summary: Delete student
- *     tags: [Students]
+ *     summary: Delete subject
+ *     tags: [Subjects]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -196,19 +192,19 @@ router.put(
  *         required: true
  *         schema:
  *           type: integer
- *         description: Student ID
+ *         description: Subject ID
  *     responses:
  *       200:
- *         description: Student deleted successfully
+ *         description: Subject deleted successfully
  *       404:
- *         description: Student not found
+ *         description: Subject not found
  *       403:
  *         description: Access denied
  */
 router.delete(
   '/:id',
   requireRole('ADMIN'),
-  deleteStudent
+  deleteSubject
 );
 
 module.exports = router;

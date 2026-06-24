@@ -28,9 +28,9 @@ model User {
 }
 
 model Department {
-  id       Int      @id @default(autoincrement())
-  name     String
-  code     String   @unique
+  id   Int    @id @default(autoincrement())
+  name String
+  code String @unique
 
   students Student[]
   faculty  Faculty[]
@@ -38,71 +38,85 @@ model Department {
 }
 
 model Student {
-  id            Int    @id @default(autoincrement())
-  regNumber     String @unique
-  name          String
-  semester      Int
-  phone         String?
+  id        Int     @id @default(autoincrement())
+  regNumber String  @unique
+  name      String
+  semester  Int
+  phone     String?
 
-  userId        Int @unique
-  departmentId  Int
+  userId       Int @unique
+  departmentId Int
 
-  user          User       @relation(fields: [userId], references: [id])
-  department    Department @relation(fields: [departmentId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
 
   attendances Attendance[]
   marks       InternalMark[]
 }
 
 model Faculty {
-  id           Int    @id @default(autoincrement())
-  empId        String @unique
-  name         String
+  id    Int    @id @default(autoincrement())
+  empId String @unique
+  name  String
 
   userId       Int @unique
   departmentId Int
 
-  user         User       @relation(fields: [userId], references: [id])
-  department   Department @relation(fields: [departmentId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
 
-  subjects     Subject[]
+  subjects Subject[]
 }
 
 model Subject {
-  id           Int    @id @default(autoincrement())
-  code         String @unique
-  name         String
-  semester     Int
+  id       Int    @id @default(autoincrement())
+  code     String @unique
+  name     String
+  semester Int
 
   departmentId Int
   facultyId    Int?
 
-  department   Department @relation(fields: [departmentId], references: [id])
-  faculty      Faculty?   @relation(fields: [facultyId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+  faculty    Faculty?   @relation(fields: [facultyId], references: [id])
 
   attendances Attendance[]
   marks       InternalMark[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Attendance {
-  id         Int      @id @default(autoincrement())
-  date       DateTime
-
-  studentId  Int
-  subjectId  Int
-
-  student    Student  @relation(fields: [studentId], references: [id])
-  subject    Subject  @relation(fields: [subjectId], references: [id])
-}
-
-model InternalMark {
-  id            Int @id @default(autoincrement())
-  internalNumber Int
-  marksObtained Float
+  id     Int      @id @default(autoincrement())
+  date   DateTime
+  status Boolean  @default(true)
 
   studentId Int
   subjectId Int
 
-  student   Student @relation(fields: [studentId], references: [id])
-  subject   Subject @relation(fields: [subjectId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, subjectId, date])
+}
+
+model InternalMark {
+  id             Int   @id @default(autoincrement())
+  internalNumber Int
+  marksObtained  Float
+
+  studentId Int
+  subjectId Int
+
+  student Student @relation(fields: [studentId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, subjectId, internalNumber])
 }
