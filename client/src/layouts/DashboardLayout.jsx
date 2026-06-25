@@ -1,4 +1,10 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  Link,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+
 import {
   AppBar,
   Toolbar,
@@ -14,13 +20,21 @@ import {
 
 function DashboardLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const user = JSON.parse(localStorage.getItem("user"));
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+
+    navigate("/", { replace: true });
   };
+
+  // Don't show sidebar/navbar on change password page
+  if (location.pathname === "/change-password") {
+    return <Outlet />;
+  }
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -61,13 +75,6 @@ function DashboardLayout() {
         }}
       >
         <List>
-          {/* Home */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/">
-              <ListItemText primary="Home" />
-            </ListItemButton>
-          </ListItem>
-
           {/* Admin Menu */}
           {user?.role === "ADMIN" && (
             <>
@@ -77,6 +84,15 @@ function DashboardLayout() {
                   to="/admin"
                 >
                   <ListItemText primary="Admin Dashboard" />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/change-password"
+                >
+                  <ListItemText primary="Change Password" />
                 </ListItemButton>
               </ListItem>
             </>
@@ -120,6 +136,15 @@ function DashboardLayout() {
                   <ListItemText primary="Internal Marks" />
                 </ListItemButton>
               </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/change-password"
+                >
+                  <ListItemText primary="Change Password" />
+                </ListItemButton>
+              </ListItem>
             </>
           )}
 
@@ -159,6 +184,15 @@ function DashboardLayout() {
                   to="/student/marks"
                 >
                   <ListItemText primary="Internal Marks" />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/change-password"
+                >
+                  <ListItemText primary="Change Password" />
                 </ListItemButton>
               </ListItem>
             </>

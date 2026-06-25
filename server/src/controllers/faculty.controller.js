@@ -629,6 +629,83 @@ const saveAttendance = async (req, res) => {
   }
 };
 
+const getStudentsForMarks = async (req, res) => {
+  try {
+    const { subjectId } = req.params;
+
+    const subject = await prisma.subject.findUnique({
+      where: {
+        id: Number(subjectId),
+      },
+      include: {
+        department: {
+          include: {
+            students: true,
+          },
+        },
+      },
+    });
+
+    if (!subject) {
+      return res.status(404).json({
+        success: false,
+        message: "Subject not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      students: subject.department.students,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+const saveInternalMarks = async (req, res) => {
+  try {
+    const { subjectId, internalNumber, marks } = req.body;
+
+    for (const studentId in marks) {
+      await prisma.internalMark.upsert({
+        where: {
+          studentId_subjectId_internalNumber: {
+            studentId: Number(studentId),
+            subjectId: Number(subjectId),
+            internalNumber: Number(internalNumber),
+          },
+        },
+        update: {
+          marksObtained: Number(marks[studentId]),
+        },
+        create: {
+          studentId: Number(studentId),
+          subjectId: Number(subjectId),
+          internalNumber: Number(internalNumber),
+          marksObtained: Number(marks[studentId]),
+        },
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Marks saved successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 module.exports = {
   createFaculty,
   getAllFaculty,
@@ -639,4 +716,6 @@ module.exports = {
   getFacultySubjects,
   getStudentsBySubject,
   saveAttendance,
+  getStudentsForMarks,
+  saveInternalMarks,
 };

@@ -18,6 +18,8 @@ const {
   getFacultySubjects,
   getStudentsBySubject,
   saveAttendance,
+  getStudentsForMarks,
+  saveInternalMarks,
 } = require("../controllers/faculty.controller");
 
 const {
@@ -27,6 +29,18 @@ const {
 
 // All routes require authentication
 router.use(verifyToken);
+
+router.get(
+  "/marks/students/:subjectId",
+  requireRole("FACULTY"),
+  getStudentsForMarks
+);
+
+router.post(
+  "/marks",
+  requireRole("FACULTY"),
+  saveInternalMarks
+);
 
 router.post(
   "/attendance",

@@ -16,6 +16,12 @@ const {
   verifyToken,
 } = require('../middlewares/auth.middleware');
 
+router.put(
+  "/change-password",
+  verifyToken,
+  changePassword
+);
+
 /**
  * @openapi
  * tags:

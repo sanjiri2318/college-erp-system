@@ -14,6 +14,10 @@ const {
   getStudentById,
   updateStudent,
   deleteStudent,
+  getStudentDashboard,
+  getStudentSubjects,
+  getStudentAttendance,
+  getStudentMarks,
 } = require('../controllers/student.controller');
 
 const {
@@ -23,6 +27,30 @@ const {
 
 // All routes require authentication
 router.use(verifyToken);
+
+router.get(
+  "/dashboard",
+  requireRole("STUDENT"),
+  getStudentDashboard
+);
+
+router.get(
+  "/subjects",
+  requireRole("STUDENT"),
+  getStudentSubjects
+);
+
+router.get(
+  "/attendance",
+  requireRole("STUDENT"),
+  getStudentAttendance
+);
+
+router.get(
+  "/marks",
+  requireRole("STUDENT"),
+  getStudentMarks
+);
 
 /**
  * @openapi

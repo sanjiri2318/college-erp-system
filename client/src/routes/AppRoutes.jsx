@@ -6,6 +6,11 @@ import FacultyDashboard from "../pages/faculty/FacultyDashboard";
 import StudentDashboard from "../pages/student/StudentDashboard";
 import MySubjects from "../pages/faculty/MySubjects";
 import FacultyAttendance from "../pages/faculty/FacultyAttendance";
+import FacultyMarks from "../pages/faculty/FacultyMarks";
+import StudentSubjects from "../pages/student/StudentSubjects";
+import StudentAttendance from "../pages/student/StudentAttendance";
+import StudentMarks from "../pages/student/StudentMarks";
+import ChangePassword from "../pages/ChangePassword";
 
 import ProtectedRoute from "./ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -15,6 +20,12 @@ function AppRoutes() {
     <Routes>
       {/* Login */}
       <Route path="/" element={<LoginPage />} />
+
+      {/* Change Password */}
+      <Route
+        path="/change-password"
+        element={<ChangePassword />}
+      />
 
       {/* Dashboard Layout */}
       <Route element={<DashboardLayout />}>
@@ -29,7 +40,7 @@ function AppRoutes() {
           }
         />
 
-        {/* Faculty Dashboard */}
+        {/* Faculty */}
         <Route
           path="/faculty"
           element={
@@ -39,7 +50,6 @@ function AppRoutes() {
           }
         />
 
-        {/* My Subjects */}
         <Route
           path="/faculty/subjects"
           element={
@@ -49,7 +59,6 @@ function AppRoutes() {
           }
         />
 
-        {/* Attendance */}
         <Route
           path="/faculty/attendance"
           element={
@@ -59,12 +68,11 @@ function AppRoutes() {
           }
         />
 
-        {/* Internal Marks */}
         <Route
           path="/faculty/marks"
           element={
             <ProtectedRoute allowedRole="FACULTY">
-              <h1>Internal Marks Page Coming Soon</h1>
+              <FacultyMarks />
             </ProtectedRoute>
           }
         />
@@ -75,6 +83,33 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRole="STUDENT">
               <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/subjects"
+          element={
+            <ProtectedRoute allowedRole="STUDENT">
+              <StudentSubjects />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/attendance"
+          element={
+            <ProtectedRoute allowedRole="STUDENT">
+              <StudentAttendance />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/marks"
+          element={
+            <ProtectedRoute allowedRole="STUDENT">
+              <StudentMarks />
             </ProtectedRoute>
           }
         />

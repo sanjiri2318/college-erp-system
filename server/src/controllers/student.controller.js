@@ -476,10 +476,210 @@ const deleteStudent = async (req, res) => {
   });
 };
 
+
+const getStudentDashboard = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const student = await prisma.student.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    const subjectCount = await prisma.subject.count({
+      where: {
+        semester: student.semester,
+        departmentId: student.departmentId,
+      },
+    });
+
+    const attendanceCount = await prisma.attendance.count({
+      where: {
+        studentId: student.id,
+        status: true,
+      },
+    });
+
+    const marksCount = await prisma.internalMark.count({
+      where: {
+        studentId: student.id,
+      },
+    });
+
+    res.json({
+      success: true,
+      dashboard: {
+        subjectCount,
+        attendanceCount,
+        marksCount,
+        semester: student.semester,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+const getStudentSubjects = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const student = await prisma.student.findUnique({
+      where: {
+        userId,
+      },
+      include: {
+        department: {
+          include: {
+            subjects: true,
+          },
+        },
+      },
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      subjects: student.department.subjects,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+const getStudentAttendance = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const student = await prisma.student.findUnique({
+      where: {
+        userId,
+      },
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    const subjects = await prisma.subject.findMany({
+      where: {
+        semester: student.semester,
+        departmentId: student.departmentId,
+      },
+    });
+
+    const attendanceData = [];
+
+    for (const subject of subjects) {
+      const total = await prisma.attendance.count({
+        where: {
+          studentId: student.id,
+          subjectId: subject.id,
+        },
+      });
+
+      const present = await prisma.attendance.count({
+        where: {
+          studentId: student.id,
+          subjectId: subject.id,
+          status: true,
+        },
+      });
+
+      const percentage =
+        total === 0
+          ? 0
+          : ((present / total) * 100).toFixed(2);
+
+      attendanceData.push({
+        subject: subject.name,
+        present,
+        total,
+        percentage,
+      });
+    }
+
+    res.json({
+      success: true,
+      attendance: attendanceData,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+
+const getStudentMarks = async (req, res) => {
+  try {
+    const student = await prisma.student.findUnique({
+      where: {
+        userId: req.user.id,
+      },
+    });
+
+    const marks = await prisma.internalMark.findMany({
+      where: {
+        studentId: student.id,
+      },
+      include: {
+        subject: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      marks,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 module.exports = {
   createStudent,
   getAllStudents,
   getStudentById,
   updateStudent,
   deleteStudent,
+  getStudentDashboard,
+  getStudentSubjects,
+  getStudentAttendance,
+  getStudentMarks,
 };

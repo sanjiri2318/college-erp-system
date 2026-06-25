@@ -28,3 +28,20 @@ export const saveAttendance = async (data) => {
 
   return res.data;
 };
+
+export const getStudentsForMarks = async (subjectId) => {
+  const res = await API.get(
+    `/faculty/marks/students/${subjectId}`
+  );
+
+  return res.data;
+};
+
+export const saveInternalMarks = async (data) => {
+  const res = await API.post(
+    "/faculty/marks",
+    data
+  );
+
+  return res.data;
+};

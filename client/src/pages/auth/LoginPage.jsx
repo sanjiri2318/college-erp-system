@@ -25,23 +25,35 @@ function LoginPage() {
     e.preventDefault();
 
     try {
-      const res = await API.post("/auth/login", formData);
+      const res = await API.post(
+        "/auth/login",
+        formData
+      );
 
       const token = res.data.data.token;
       const user = res.data.data.user;
 
+      // Save user and token
       login(user, token);
 
+      // Force password change
+      if (user.mustChangePassword) {
+        navigate("/change-password");
+        return;
+      }
+
+      // Role-based navigation
       if (user.role === "ADMIN") {
         navigate("/admin");
       } else if (user.role === "FACULTY") {
         navigate("/faculty");
-      } else {
+      } else if (user.role === "STUDENT") {
         navigate("/student");
       }
     } catch (err) {
       setMessage(
-        err.response?.data?.message || "Login failed"
+        err.response?.data?.message ||
+          "Login failed"
       );
     }
   };
@@ -82,7 +94,11 @@ function LoginPage() {
         <br />
         <br />
 
-        {message && <p>{message}</p>}
+        {message && (
+          <p style={{ color: "red" }}>
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );
