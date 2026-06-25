@@ -413,10 +413,230 @@ const deleteFaculty = async (req, res) => {
   });
 };
 
+const getFacultyDashboard = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const faculty = await prisma.faculty.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (!faculty) {
+      return res.status(404).json({
+        success: false,
+        message: "Faculty not found",
+      });
+    }
+
+    const subjectCount = await prisma.subject.count({
+      where: {
+        facultyId: faculty.id,
+      },
+    });
+
+    const studentCount = await prisma.student.count({
+      where: {
+        departmentId: faculty.departmentId,
+      },
+    });
+
+    const attendanceToday = await prisma.attendance.count({
+      where: {
+        subject: {
+          facultyId: faculty.id,
+        },
+      },
+    });
+
+    const internalMarksCount = await prisma.internalMark.count({
+      where: {
+        subject: {
+          facultyId: faculty.id,
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      dashboard: {
+        subjectCount,
+        studentCount,
+        attendanceToday,
+        internalMarksCount,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+const getMySubjects = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const faculty = await prisma.faculty.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (!faculty) {
+      return res.status(404).json({
+        success: false,
+        message: "Faculty not found",
+      });
+    }
+
+    const subjects = await prisma.subject.findMany({
+      where: {
+        facultyId: faculty.id,
+      },
+      include: {
+        department: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+      },
+      orderBy: {
+        semester: "asc",
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      subjects,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+const getStudentsBySubject = async (req, res) => {
+  try {
+    const subjectId = parseInt(req.params.subjectId);
+
+    const students = await prisma.student.findMany({
+      where: {
+        department: {
+          subjects: {
+            some: {
+              id: subjectId,
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        regNumber: true,
+        name: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      students,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+const getFacultySubjects = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const faculty = await prisma.faculty.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (!faculty) {
+      return res.status(404).json({
+        success: false,
+        message: "Faculty not found",
+      });
+    }
+
+    const subjects = await prisma.subject.findMany({
+      where: {
+        facultyId: faculty.id,
+      },
+      include: {
+        department: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      subjects,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+const saveAttendance = async (req, res) => {
+  try {
+    const { subjectId, attendance } = req.body;
+
+    for (const studentId in attendance) {
+      await prisma.attendance.create({
+        data: {
+          studentId: Number(studentId),
+          subjectId: Number(subjectId),
+          status: attendance[studentId],
+          date: new Date(),
+        },
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Attendance saved successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 module.exports = {
   createFaculty,
   getAllFaculty,
   getFacultyById,
   updateFaculty,
   deleteFaculty,
+  getFacultyDashboard,
+  getFacultySubjects,
+  getStudentsBySubject,
+  saveAttendance,
 };

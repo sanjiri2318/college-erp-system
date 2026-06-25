@@ -14,7 +14,11 @@ const {
   getFacultyById,
   updateFaculty,
   deleteFaculty,
-} = require('../controllers/faculty.controller');
+  getFacultyDashboard,
+  getFacultySubjects,
+  getStudentsBySubject,
+  saveAttendance,
+} = require("../controllers/faculty.controller");
 
 const {
   verifyToken,
@@ -23,6 +27,36 @@ const {
 
 // All routes require authentication
 router.use(verifyToken);
+
+router.post(
+  "/attendance",
+  requireRole("FACULTY"),
+  saveAttendance
+);
+
+router.get(
+  "/dashboard",
+  requireRole("FACULTY"),
+  getFacultyDashboard
+);
+
+router.get(
+  "/subjects",
+  requireRole("FACULTY"),
+  getFacultySubjects
+);
+
+router.get(
+  "/attendance/students/:subjectId",
+  requireRole("FACULTY"),
+  getStudentsBySubject
+);
+
+router.get(
+  "/",
+  requireRole("ADMIN", "FACULTY"),
+  getAllFaculty
+);
 
 /**
  * @openapi
@@ -91,11 +125,6 @@ router.post(
  *       403:
  *         description: Access denied
  */
-router.get(
-  '/',
-  requireRole('ADMIN', 'FACULTY'),
-  getAllFaculty
-);
 
 /**
  * @openapi

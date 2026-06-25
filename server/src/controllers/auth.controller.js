@@ -23,6 +23,10 @@ const login = async (req, res) => {
     where: {
       email: email.toLowerCase().trim(),
     },
+    include: {
+      faculty: true,
+      student: true,
+    },
   });
 
   if (!user) {
@@ -66,6 +70,10 @@ const login = async (req, res) => {
         email: user.email,
         role: user.role,
         mustChangePassword: user.mustChangePassword,
+        name:
+          user.faculty?.name ||
+          user.student?.name ||
+          user.email,
       },
     },
   });
