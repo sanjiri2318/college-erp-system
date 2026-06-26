@@ -10,6 +10,7 @@ const {
   getAdminDashboard,
   getFacultyDashboard,
   getStudentDashboard,
+  getDashboardAnalytics,
 } = require('../controllers/dashboard.controller');
 
 const {
@@ -19,6 +20,14 @@ const {
 
 // All dashboard routes require authentication
 router.use(verifyToken);
+
+router.get(
+  "/analytics",
+  verifyToken,
+  requireRole("ADMIN"),
+  getDashboardAnalytics
+);
+
 
 /**
  * @openapi

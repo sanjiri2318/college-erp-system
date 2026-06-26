@@ -22,24 +22,38 @@ function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const drawerWidth = 220;
+
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    navigate("/", { replace: true });
+    navigate("/", {
+      replace: true,
+    });
   };
 
-  // Don't show sidebar/navbar on change password page
-  if (location.pathname === "/change-password") {
+  // Hide navbar and sidebar on change password page
+  if (
+    location.pathname === "/change-password"
+  ) {
     return <Outlet />;
   }
 
   return (
     <Box sx={{ display: "flex" }}>
       {/* Top Navbar */}
-      <AppBar position="fixed">
+      <AppBar
+        position="fixed"
+        sx={{
+          zIndex: (theme) =>
+            theme.zIndex.drawer + 1,
+        }}
+      >
         <Toolbar>
           <Typography
             variant="h6"
@@ -65,17 +79,17 @@ function DashboardLayout() {
       <Drawer
         variant="permanent"
         sx={{
-          width: 220,
+          width: drawerWidth,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: 220,
+            width: drawerWidth,
             boxSizing: "border-box",
             mt: 8,
           },
         }}
       >
         <List>
-          {/* Admin Menu */}
+          {/* ADMIN */}
           {user?.role === "ADMIN" && (
             <>
               <ListItem disablePadding>
@@ -95,10 +109,46 @@ function DashboardLayout() {
                   <ListItemText primary="Change Password" />
                 </ListItemButton>
               </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/admin/students"
+                >
+                  <ListItemText primary="Students" />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/admin/faculty"
+                >
+                  <ListItemText primary="Faculty" />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/admin/departments"
+                >
+                  <ListItemText primary="Departments" />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/admin/subjects"
+                >
+                  <ListItemText primary="Subjects" />
+                </ListItemButton>
+              </ListItem>
             </>
           )}
 
-          {/* Faculty Menu */}
+          {/* FACULTY */}
           {user?.role === "FACULTY" && (
             <>
               <ListItem disablePadding>
@@ -148,7 +198,7 @@ function DashboardLayout() {
             </>
           )}
 
-          {/* Student Menu */}
+          {/* STUDENT */}
           {user?.role === "STUDENT" && (
             <>
               <ListItem disablePadding>
@@ -205,9 +255,11 @@ function DashboardLayout() {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: 4,
           mt: 8,
-          ml: "220px",
+          width: `calc(100% - ${drawerWidth}px)`,
+          minHeight: "100vh",
+          backgroundColor: "#f5f5f5",
         }}
       >
         <Outlet />

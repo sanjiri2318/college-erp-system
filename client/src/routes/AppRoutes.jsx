@@ -11,6 +11,10 @@ import StudentSubjects from "../pages/student/StudentSubjects";
 import StudentAttendance from "../pages/student/StudentAttendance";
 import StudentMarks from "../pages/student/StudentMarks";
 import ChangePassword from "../pages/ChangePassword";
+import StudentsPage from "../pages/admin/StudentsPage";
+import FacultyPage from "../pages/admin/FacultyPage";
+import DepartmentsPage from "../pages/admin/DepartmentsPage";
+import SubjectsPage from "../pages/admin/SubjectsPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -110,6 +114,42 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRole="STUDENT">
               <StudentMarks />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/students"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <StudentsPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/admin/faculty"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <FacultyPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/admin/departments"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <DepartmentsPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/admin/subjects"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <SubjectsPage />
             </ProtectedRoute>
           }
         />

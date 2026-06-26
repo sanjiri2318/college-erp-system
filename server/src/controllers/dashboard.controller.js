@@ -227,8 +227,62 @@ const getStudentDashboard = async (req, res) => {
   }
 };
 
+const getDashboardAnalytics = async (req, res) => {
+  try {
+    const departments = await prisma.department.findMany({
+      include: {
+        students: true,
+        faculty: true,
+      },
+    });
+
+    const studentsByDepartment = departments.map((d) => ({
+      name: d.code,
+      count: d.students.length,
+    }));
+
+    const facultyByDepartment = departments.map((d) => ({
+      name: d.code,
+      count: d.faculty.length,
+    }));
+
+    const subjects = await prisma.subject.findMany();
+
+    const semesterMap = {};
+
+    subjects.forEach((s) => {
+      semesterMap[s.semester] =
+        (semesterMap[s.semester] || 0) + 1;
+    });
+
+    const subjectsBySemester = Object.keys(
+      semesterMap
+    ).map((sem) => ({
+      name: `Sem ${sem}`,
+      count: semesterMap[sem],
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        studentsByDepartment,
+        facultyByDepartment,
+        subjectsBySemester,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 module.exports = {
   getAdminDashboard,
   getFacultyDashboard,
   getStudentDashboard,
+  getDashboardAnalytics,
 };
