@@ -672,6 +672,50 @@ const getStudentMarks = async (req, res) => {
   }
 };
 
+const getStudentsByDepartmentAndSemester = async (req, res) => {
+  try {
+    const departmentId = parseInt(req.query.departmentId);
+    const semester = parseInt(req.query.semester);
+
+    if (isNaN(departmentId) || isNaN(semester)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "departmentId and semester are required.",
+      });
+    }
+
+    const students = await prisma.student.findMany({
+      where: {
+        departmentId,
+        semester,
+      },
+      orderBy: {
+        name: "asc",
+      },
+      select: {
+        id: true,
+        regNumber: true,
+        name: true,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        students,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 module.exports = {
   createStudent,
   getAllStudents,
@@ -682,4 +726,5 @@ module.exports = {
   getStudentSubjects,
   getStudentAttendance,
   getStudentMarks,
+  getStudentsByDepartmentAndSemester,
 };

@@ -13,9 +13,11 @@ import {
   TableBody,
   Checkbox,
   Button,
+  TextField,
 } from "@mui/material";
 
 import { useEffect, useState } from "react";
+
 import {
   getMySubjects,
   getStudentsBySubject,
@@ -27,6 +29,10 @@ const FacultyAttendance = () => {
   const [subjectId, setSubjectId] = useState("");
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState({});
+
+  const [date, setDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
 
   useEffect(() => {
     fetchSubjects();
@@ -70,16 +76,36 @@ const FacultyAttendance = () => {
   };
 
   const handleSave = async () => {
-    try {
-        const res = await saveAttendance({
-            subjectId,
-            attendance,
-        });
-        alert(res.message);
-    } catch (error) {
-        console.log(error);
+    if (!subjectId) {
+      alert("Please select a subject.");
+      return;
     }
-   };
+
+    if (students.length === 0) {
+      alert("No students found.");
+      return;
+    }
+
+    try {
+      for (const student of students) {
+        await saveAttendance({
+          studentId: student.id,
+          subjectId: Number(subjectId),
+          date,
+          status: attendance[student.id],
+        });
+      }
+
+      alert("Attendance saved successfully.");
+    } catch (error) {
+      console.log(error);
+
+      alert(
+        error.response?.data?.message ||
+          "Failed to save attendance."
+      );
+    }
+  };
 
   return (
     <Box p={4}>
@@ -87,8 +113,16 @@ const FacultyAttendance = () => {
         Attendance
       </Typography>
 
-      <FormControl sx={{ minWidth: 300 }}>
-        <InputLabel>Select Subject</InputLabel>
+      {/* Subject Dropdown */}
+      <FormControl
+        sx={{
+          minWidth: 300,
+          mr: 3,
+        }}
+      >
+        <InputLabel>
+          Select Subject
+        </InputLabel>
 
         <Select
           value={subjectId}
@@ -106,21 +140,45 @@ const FacultyAttendance = () => {
         </Select>
       </FormControl>
 
+      {/* Date Picker */}
+      <TextField
+        type="date"
+        label="Attendance Date"
+        value={date}
+        onChange={(e) =>
+          setDate(e.target.value)
+        }
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+
+      {/* Student Table */}
       {students.length > 0 && (
         <>
           <Paper sx={{ mt: 4 }}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Reg No</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Present</TableCell>
+                  <TableCell>
+                    Reg Number
+                  </TableCell>
+
+                  <TableCell>
+                    Student Name
+                  </TableCell>
+
+                  <TableCell>
+                    Present
+                  </TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
                 {students.map((student) => (
-                  <TableRow key={student.id}>
+                  <TableRow
+                    key={student.id}
+                  >
                     <TableCell>
                       {student.regNumber}
                     </TableCell>
@@ -132,7 +190,9 @@ const FacultyAttendance = () => {
                     <TableCell>
                       <Checkbox
                         checked={
-                          attendance[student.id] || false
+                          attendance[
+                            student.id
+                          ] || false
                         }
                         onChange={() =>
                           handleCheckboxChange(

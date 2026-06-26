@@ -19,19 +19,21 @@ const FacultyDashboard = () => {
   const { user } = useContext(AuthContext);
 
   const [dashboard, setDashboard] = useState({
-    subjectCount: 0,
-    studentCount: 0,
-    attendanceToday: 0,
-    internalMarksCount: 0,
+    facultyName: "",
+    totalSubjectsHandled: 0,
+    totalStudents: 0,
+    attendanceMarkedToday: 0,
+    internalMarksEntered: 0,
   });
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await getFacultyDashboard();
-        console.log("Dashboard API =", res);
+        const data = await getFacultyDashboard();
 
-        setDashboard(res.dashboard);
+        console.log("Dashboard API =", data);
+
+        setDashboard(data);
       } catch (err) {
         console.log(err);
       }
@@ -43,30 +45,35 @@ const FacultyDashboard = () => {
   const cards = [
     {
       title: "Subjects Handled",
-      value: dashboard.subjectCount,
+      value: dashboard.totalSubjectsHandled,
       icon: <MenuBookIcon sx={{ fontSize: 40 }} />,
     },
     {
       title: "Total Students",
-      value: dashboard.studentCount,
+      value: dashboard.totalStudents,
       icon: <GroupsIcon sx={{ fontSize: 40 }} />,
     },
     {
       title: "Attendance Today",
-      value: dashboard.attendanceToday,
+      value: dashboard.attendanceMarkedToday,
       icon: <FactCheckIcon sx={{ fontSize: 40 }} />,
     },
     {
       title: "Internal Marks",
-      value: dashboard.internalMarksCount,
+      value: dashboard.internalMarksEntered,
       icon: <AssignmentIcon sx={{ fontSize: 40 }} />,
     },
   ];
 
   return (
     <Box p={4}>
-      <Typography variant="h4" fontWeight="bold" mb={4}>
-        Welcome, {user?.name}
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        mb={4}
+      >
+        Welcome,{" "}
+        {dashboard.facultyName || user?.name}
       </Typography>
 
       <Grid container spacing={3}>
@@ -82,6 +89,7 @@ const FacultyDashboard = () => {
               sx={{
                 borderRadius: 3,
                 boxShadow: 5,
+                height: "100%",
               }}
             >
               <CardContent>
@@ -98,6 +106,7 @@ const FacultyDashboard = () => {
                     <Typography
                       variant="h4"
                       fontWeight="bold"
+                      sx={{ mt: 1 }}
                     >
                       {card.value}
                     </Typography>

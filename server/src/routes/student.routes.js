@@ -18,6 +18,7 @@ const {
   getStudentSubjects,
   getStudentAttendance,
   getStudentMarks,
+  getStudentsByDepartmentAndSemester,
 } = require('../controllers/student.controller');
 
 const {
@@ -27,6 +28,12 @@ const {
 
 // All routes require authentication
 router.use(verifyToken);
+
+router.get(
+  "/filter",
+  requireRole("ADMIN", "FACULTY"),
+  getStudentsByDepartmentAndSemester
+);
 
 router.get(
   "/dashboard",
