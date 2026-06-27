@@ -11,6 +11,13 @@ import {
   Box,
 } from "@mui/material";
 
+import SchoolIcon from "@mui/icons-material/School";
+import GroupsIcon from "@mui/icons-material/Groups";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+
 import {
   ResponsiveContainer,
   BarChart,
@@ -26,20 +33,22 @@ import {
 } from "recharts";
 
 function AdminDashboard() {
-  const [dashboard, setDashboard] = useState({
-    totalStudents: 0,
-    totalFaculty: 0,
-    totalDepartments: 0,
-    totalSubjects: 0,
-    totalAttendanceRecords: 0,
-    totalInternalMarks: 0,
-  });
+  const [dashboard, setDashboard] =
+    useState({
+      totalStudents: 0,
+      totalFaculty: 0,
+      totalDepartments: 0,
+      totalSubjects: 0,
+      totalAttendanceRecords: 0,
+      totalInternalMarks: 0,
+    });
 
-  const [analytics, setAnalytics] = useState({
-    studentsByDepartment: [],
-    facultyByDepartment: [],
-    subjectsBySemester: [],
-  });
+  const [analytics, setAnalytics] =
+    useState({
+      studentsByDepartment: [],
+      facultyByDepartment: [],
+      subjectsBySemester: [],
+    });
 
   useEffect(() => {
     fetchDashboard();
@@ -48,46 +57,108 @@ function AdminDashboard() {
 
   const fetchDashboard = async () => {
     try {
-      const res = await API.get("/dashboard/admin");
-      setDashboard(res.data.data);
+      const res = await API.get(
+        "/dashboard/admin"
+      );
+
+      setDashboard(
+        res.data.data
+      );
     } catch (err) {
       console.log(err);
     }
   };
 
-  const fetchAnalytics = async () => {
-    try {
-      const data = await getDashboardAnalytics();
-      setAnalytics(data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const fetchAnalytics =
+    async () => {
+      try {
+        const data =
+          await getDashboardAnalytics();
+
+        setAnalytics(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
   const cards = [
     {
       title: "Students",
-      value: dashboard.totalStudents,
+      value:
+        dashboard.totalStudents,
+      icon: (
+        <SchoolIcon
+          sx={{
+            fontSize: 45,
+          }}
+        />
+      ),
+      color: "#1976d2",
     },
     {
       title: "Faculty",
-      value: dashboard.totalFaculty,
+      value:
+        dashboard.totalFaculty,
+      icon: (
+        <GroupsIcon
+          sx={{
+            fontSize: 45,
+          }}
+        />
+      ),
+      color: "#2e7d32",
     },
     {
       title: "Departments",
-      value: dashboard.totalDepartments,
+      value:
+        dashboard.totalDepartments,
+      icon: (
+        <ApartmentIcon
+          sx={{
+            fontSize: 45,
+          }}
+        />
+      ),
+      color: "#ed6c02",
     },
     {
       title: "Subjects",
-      value: dashboard.totalSubjects,
+      value:
+        dashboard.totalSubjects,
+      icon: (
+        <MenuBookIcon
+          sx={{
+            fontSize: 45,
+          }}
+        />
+      ),
+      color: "#9c27b0",
     },
     {
       title: "Attendance",
-      value: dashboard.totalAttendanceRecords,
+      value:
+        dashboard.totalAttendanceRecords,
+      icon: (
+        <FactCheckIcon
+          sx={{
+            fontSize: 45,
+          }}
+        />
+      ),
+      color: "#d32f2f",
     },
     {
       title: "Internal Marks",
-      value: dashboard.totalInternalMarks,
+      value:
+        dashboard.totalInternalMarks,
+      icon: (
+        <AssignmentIcon
+          sx={{
+            fontSize: 45,
+          }}
+        />
+      ),
+      color: "#0288d1",
     },
   ];
 
@@ -107,18 +178,25 @@ function AdminDashboard() {
       }}
     >
       <Typography
-        variant="h3"
-        gutterBottom
-        sx={{
-          mb: 4,
-          fontWeight: "bold",
-        }}
+        variant="h4"
+        fontWeight="bold"
       >
-        Admin Dashboard
+        Welcome Back 👋
       </Typography>
 
-      {/* Dashboard Cards */}
-      <Grid container spacing={3}>
+      <Typography
+        color="text.secondary"
+        mb={4}
+      >
+        Here's an overview of
+        your College ERP System.
+      </Typography>
+
+      {/* Cards */}
+      <Grid
+        container
+        spacing={3}
+      >
         {cards.map((card) => (
           <Grid
             item
@@ -130,31 +208,58 @@ function AdminDashboard() {
           >
             <Card
               sx={{
-                borderRadius: 3,
-                boxShadow: 3,
+                borderRadius: 4,
+                boxShadow: 5,
                 height: 170,
-                display: "flex",
-                alignItems: "center",
+                transition:
+                  "0.3s",
+                "&:hover": {
+                  transform:
+                    "translateY(-6px)",
+                  boxShadow: 8,
+                },
               }}
             >
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  color="text.secondary"
-                >
-                  {card.title}
-                </Typography>
+              <CardContent
+                sx={{
+                  display:
+                    "flex",
+                  justifyContent:
+                    "space-between",
+                  alignItems:
+                    "center",
+                  height: "100%",
+                }}
+              >
+                <Box>
+                  <Typography
+                    variant="h6"
+                    color="text.secondary"
+                  >
+                    {card.title}
+                  </Typography>
 
-                <Typography
-                  variant="h2"
+                  <Typography
+                    variant="h3"
+                    fontWeight="bold"
+                    sx={{
+                      mt: 1,
+                      color:
+                        card.color,
+                    }}
+                  >
+                    {card.value}
+                  </Typography>
+                </Box>
+
+                <Box
                   sx={{
-                    mt: 2,
-                    fontWeight: "bold",
-                    color: "#1976d2",
+                    color:
+                      card.color,
                   }}
                 >
-                  {card.value}
-                </Typography>
+                  {card.icon}
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -168,7 +273,11 @@ function AdminDashboard() {
         sx={{ mt: 2 }}
       >
         {/* Students */}
-        <Grid item xs={12} lg={4}>
+        <Grid
+          item
+          xs={12}
+          lg={4}
+        >
           <Paper
             sx={{
               p: 3,
@@ -180,7 +289,8 @@ function AdminDashboard() {
               variant="h6"
               gutterBottom
             >
-              Students by Department
+              Students by
+              Department
             </Typography>
 
             <ResponsiveContainer
@@ -188,7 +298,9 @@ function AdminDashboard() {
               height="90%"
             >
               <BarChart
-                data={analytics.studentsByDepartment}
+                data={
+                  analytics.studentsByDepartment
+                }
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
@@ -199,7 +311,12 @@ function AdminDashboard() {
                 <Bar
                   dataKey="count"
                   fill="#1976d2"
-                  radius={[8, 8, 0, 0]}
+                  radius={[
+                    8,
+                    8,
+                    0,
+                    0,
+                  ]}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -207,7 +324,11 @@ function AdminDashboard() {
         </Grid>
 
         {/* Faculty */}
-        <Grid item xs={12} lg={4}>
+        <Grid
+          item
+          xs={12}
+          lg={4}
+        >
           <Paper
             sx={{
               p: 3,
@@ -219,7 +340,8 @@ function AdminDashboard() {
               variant="h6"
               gutterBottom
             >
-              Faculty by Department
+              Faculty by
+              Department
             </Typography>
 
             <ResponsiveContainer
@@ -228,23 +350,35 @@ function AdminDashboard() {
             >
               <PieChart>
                 <Pie
-                  data={analytics.facultyByDepartment}
+                  data={
+                    analytics.facultyByDepartment
+                  }
                   dataKey="count"
                   nameKey="name"
                   cx="50%"
                   cy="45%"
-                  outerRadius={100}
-                  innerRadius={50}
+                  outerRadius={
+                    100
+                  }
+                  innerRadius={
+                    50
+                  }
                   paddingAngle={2}
                   label
                 >
                   {analytics.facultyByDepartment.map(
-                    (_, index) => (
+                    (
+                      _,
+                      index
+                    ) => (
                       <Cell
-                        key={index}
+                        key={
+                          index
+                        }
                         fill={
                           COLORS[
-                            index % COLORS.length
+                            index %
+                              COLORS.length
                           ]
                         }
                       />
@@ -253,6 +387,7 @@ function AdminDashboard() {
                 </Pie>
 
                 <Tooltip />
+
                 <Legend
                   verticalAlign="bottom"
                   height={36}
@@ -263,7 +398,11 @@ function AdminDashboard() {
         </Grid>
 
         {/* Subjects */}
-        <Grid item xs={12} lg={4}>
+        <Grid
+          item
+          xs={12}
+          lg={4}
+        >
           <Paper
             sx={{
               p: 3,
@@ -275,7 +414,8 @@ function AdminDashboard() {
               variant="h6"
               gutterBottom
             >
-              Subjects by Semester
+              Subjects by
+              Semester
             </Typography>
 
             <ResponsiveContainer
@@ -283,7 +423,9 @@ function AdminDashboard() {
               height="90%"
             >
               <BarChart
-                data={analytics.subjectsBySemester}
+                data={
+                  analytics.subjectsBySemester
+                }
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
@@ -294,7 +436,12 @@ function AdminDashboard() {
                 <Bar
                   dataKey="count"
                   fill="#2e7d32"
-                  radius={[8, 8, 0, 0]}
+                  radius={[
+                    8,
+                    8,
+                    0,
+                    0,
+                  ]}
                 />
               </BarChart>
             </ResponsiveContainer>

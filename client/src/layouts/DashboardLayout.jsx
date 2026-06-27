@@ -104,15 +104,6 @@ function DashboardLayout() {
               <ListItem disablePadding>
                 <ListItemButton
                   component={Link}
-                  to="/change-password"
-                >
-                  <ListItemText primary="Change Password" />
-                </ListItemButton>
-              </ListItem>
-
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
                   to="/admin/students"
                 >
                   <ListItemText primary="Students" />
@@ -145,6 +136,26 @@ function DashboardLayout() {
                   <ListItemText primary="Subjects" />
                 </ListItemButton>
               </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/change-password"
+                >
+                  <ListItemText primary="Change Password" />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/profile"
+                >
+                  <ListItemText primary="Profile" />
+                </ListItemButton>
+              </ListItem>
+
+              
             </>
           )}
 
@@ -184,6 +195,15 @@ function DashboardLayout() {
                   to="/faculty/marks"
                 >
                   <ListItemText primary="Internal Marks" />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/profile"
+                >
+                  <ListItemText primary="Profile" />
                 </ListItemButton>
               </ListItem>
 
@@ -234,6 +254,15 @@ function DashboardLayout() {
                   to="/student/marks"
                 >
                   <ListItemText primary="Internal Marks" />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/profile"
+                >
+                  <ListItemText primary="Profile" />
                 </ListItemButton>
               </ListItem>
 

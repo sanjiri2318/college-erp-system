@@ -15,6 +15,7 @@ import StudentsPage from "../pages/admin/StudentsPage";
 import FacultyPage from "../pages/admin/FacultyPage";
 import DepartmentsPage from "../pages/admin/DepartmentsPage";
 import SubjectsPage from "../pages/admin/SubjectsPage";
+import Profile from "../pages/Profile";
 
 import ProtectedRoute from "./ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -40,6 +41,15 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRole="ADMIN">
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

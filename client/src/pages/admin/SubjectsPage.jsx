@@ -16,6 +16,10 @@ import {
   MenuItem,
 } from "@mui/material";
 
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 import { useEffect, useState } from "react";
 import API from "../../api/axios";
 
@@ -62,27 +66,35 @@ function SubjectsPage() {
 
   const loadDepartments =
     async () => {
-      const res =
-        await API.get(
-          "/departments"
-        );
+      try {
+        const res =
+          await API.get(
+            "/departments"
+          );
 
-      setDepartments(
-        res.data.data
-          .departments
-      );
+        setDepartments(
+          res.data.data
+            .departments
+        );
+      } catch (err) {
+        console.log(err);
+      }
     };
 
   const loadFaculty =
     async () => {
-      const res =
-        await API.get(
-          "/faculty"
-        );
+      try {
+        const res =
+          await API.get(
+            "/faculty"
+          );
 
-      setFaculty(
-        res.data.data.faculty
-      );
+        setFaculty(
+          res.data.data.faculty
+        );
+      } catch (err) {
+        console.log(err);
+      }
     };
 
   useEffect(() => {
@@ -169,7 +181,7 @@ function SubjectsPage() {
     async (id) => {
       if (
         !window.confirm(
-          "Delete subject?"
+          "Delete this subject?"
         )
       )
         return;
@@ -190,48 +202,96 @@ function SubjectsPage() {
 
   return (
     <Box>
-      <Typography
-        variant="h3"
-        gutterBottom
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
       >
-        Subjects
-      </Typography>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+        >
+          Subject Management
+        </Typography>
 
-      <Button
-        variant="contained"
-        sx={{ mb: 2 }}
-        onClick={() =>
-          setOpen(true)
-        }
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() =>
+            setOpen(true)
+          }
+        >
+          Add Subject
+        </Button>
+      </Box>
+
+      <Paper
+        elevation={4}
+        sx={{
+          borderRadius: 3,
+          overflow: "hidden",
+        }}
       >
-        Add Subject
-      </Button>
-
-      <Paper>
         <Table>
-          <TableHead>
+          <TableHead
+            sx={{
+              backgroundColor:
+                "#1976d2",
+            }}
+          >
             <TableRow>
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Code
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Name
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Semester
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Department
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Faculty
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Actions
               </TableCell>
             </TableRow>
@@ -241,20 +301,15 @@ function SubjectsPage() {
             {subjects.map(
               (subject) => (
                 <TableRow
-                  key={
-                    subject.id
-                  }
+                  key={subject.id}
+                  hover
                 >
                   <TableCell>
-                    {
-                      subject.code
-                    }
+                    {subject.code}
                   </TableCell>
 
                   <TableCell>
-                    {
-                      subject.name
-                    }
+                    {subject.name}
                   </TableCell>
 
                   <TableCell>
@@ -280,6 +335,14 @@ function SubjectsPage() {
 
                   <TableCell>
                     <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={
+                        <EditIcon />
+                      }
+                      sx={{
+                        mr: 1,
+                      }}
                       onClick={() =>
                         openEdit(
                           subject
@@ -290,7 +353,12 @@ function SubjectsPage() {
                     </Button>
 
                     <Button
+                      variant="outlined"
                       color="error"
+                      size="small"
+                      startIcon={
+                        <DeleteIcon />
+                      }
                       onClick={() =>
                         handleDelete(
                           subject.id
@@ -314,8 +382,18 @@ function SubjectsPage() {
         onClose={() =>
           setOpen(false)
         }
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>
+        <DialogTitle
+          sx={{
+            bgcolor:
+              "#1976d2",
+            color: "white",
+            fontWeight:
+              "bold",
+          }}
+        >
           Add Subject
         </DialogTitle>
 
@@ -383,7 +461,7 @@ function SubjectsPage() {
             }
           >
             <MenuItem value="">
-              None
+              Not Assigned
             </MenuItem>
 
             {faculty.map(
@@ -409,6 +487,7 @@ function SubjectsPage() {
           </Button>
 
           <Button
+            variant="contained"
             onClick={
               handleAdd
             }
@@ -425,8 +504,18 @@ function SubjectsPage() {
         onClose={() =>
           setEditOpen(false)
         }
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>
+        <DialogTitle
+          sx={{
+            bgcolor:
+              "#1976d2",
+            color: "white",
+            fontWeight:
+              "bold",
+          }}
+        >
           Edit Subject
         </DialogTitle>
 
@@ -509,7 +598,7 @@ function SubjectsPage() {
             }
           >
             <MenuItem value="">
-              None
+              Not Assigned
             </MenuItem>
 
             {faculty.map(
@@ -535,6 +624,7 @@ function SubjectsPage() {
           </Button>
 
           <Button
+            variant="contained"
             onClick={
               handleUpdate
             }

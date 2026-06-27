@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import API from "../../api/axios";
+
 import {
   Box,
   Button,
@@ -15,34 +18,47 @@ import {
   TextField,
 } from "@mui/material";
 
-import { useEffect, useState } from "react";
-import API from "../../api/axios";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function DepartmentsPage() {
-  const [departments, setDepartments] = useState([]);
+  const [departments, setDepartments] =
+    useState([]);
 
-  const [open, setOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
+  const [open, setOpen] =
+    useState(false);
 
-  const [selectedDepartment, setSelectedDepartment] =
-    useState(null);
+  const [editOpen, setEditOpen] =
+    useState(false);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    code: "",
-  });
+  const [
+    selectedDepartment,
+    setSelectedDepartment,
+  ] = useState(null);
 
-  const loadDepartments = async () => {
-    try {
-      const res = await API.get("/departments");
+  const [formData, setFormData] =
+    useState({
+      name: "",
+      code: "",
+    });
 
-      setDepartments(
-        res.data.data.departments
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const loadDepartments =
+    async () => {
+      try {
+        const res =
+          await API.get(
+            "/departments"
+          );
+
+        setDepartments(
+          res.data.data
+            .departments
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
   useEffect(() => {
     loadDepartments();
@@ -74,12 +90,15 @@ function DepartmentsPage() {
         loadDepartments();
       } catch (err) {
         alert(
-          err.response?.data?.message
+          err.response?.data
+            ?.message
         );
       }
     };
 
-  const openEdit = (department) => {
+  const openEdit = (
+    department
+  ) => {
     setSelectedDepartment(
       department
     );
@@ -105,7 +124,8 @@ function DepartmentsPage() {
         loadDepartments();
       } catch (err) {
         alert(
-          err.response?.data?.message
+          err.response?.data
+            ?.message
         );
       }
     };
@@ -114,7 +134,7 @@ function DepartmentsPage() {
     async (id) => {
       if (
         !window.confirm(
-          "Delete department?"
+          "Delete this department?"
         )
       )
         return;
@@ -127,43 +147,81 @@ function DepartmentsPage() {
         loadDepartments();
       } catch (err) {
         alert(
-          err.response?.data?.message
+          err.response?.data
+            ?.message
         );
       }
     };
 
   return (
     <Box>
-      <Typography
-        variant="h3"
-        gutterBottom
-      >
-        Departments
-      </Typography>
+      {/* Header */}
 
-      <Button
-        variant="contained"
-        sx={{ mb: 2 }}
-        onClick={() =>
-          setOpen(true)
-        }
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
       >
-        Add Department
-      </Button>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+        >
+          Department Management
+        </Typography>
 
-      <Paper>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() =>
+            setOpen(true)
+          }
+        >
+          Add Department
+        </Button>
+      </Box>
+
+      {/* Table */}
+
+      <Paper
+        elevation={4}
+        sx={{
+          borderRadius: 3,
+          overflow: "hidden",
+        }}
+      >
         <Table>
-          <TableHead>
+          <TableHead
+            sx={{
+              backgroundColor:
+                "#1976d2",
+            }}
+          >
             <TableRow>
-              <TableCell>
-                Code
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                Department Code
               </TableCell>
 
-              <TableCell>
-                Name
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                Department Name
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Actions
               </TableCell>
             </TableRow>
@@ -176,6 +234,7 @@ function DepartmentsPage() {
                   key={
                     department.id
                   }
+                  hover
                 >
                   <TableCell>
                     {
@@ -191,6 +250,14 @@ function DepartmentsPage() {
 
                   <TableCell>
                     <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={
+                        <EditIcon />
+                      }
+                      sx={{
+                        mr: 1,
+                      }}
                       onClick={() =>
                         openEdit(
                           department
@@ -201,7 +268,12 @@ function DepartmentsPage() {
                     </Button>
 
                     <Button
+                      variant="outlined"
                       color="error"
+                      size="small"
+                      startIcon={
+                        <DeleteIcon />
+                      }
                       onClick={() =>
                         handleDelete(
                           department.id
@@ -225,8 +297,18 @@ function DepartmentsPage() {
         onClose={() =>
           setOpen(false)
         }
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>
+        <DialogTitle
+          sx={{
+            bgcolor:
+              "#1976d2",
+            color: "white",
+            fontWeight:
+              "bold",
+          }}
+        >
           Add Department
         </DialogTitle>
 
@@ -262,6 +344,7 @@ function DepartmentsPage() {
           </Button>
 
           <Button
+            variant="contained"
             onClick={
               handleAddDepartment
             }
@@ -278,8 +361,18 @@ function DepartmentsPage() {
         onClose={() =>
           setEditOpen(false)
         }
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>
+        <DialogTitle
+          sx={{
+            bgcolor:
+              "#1976d2",
+            color: "white",
+            fontWeight:
+              "bold",
+          }}
+        >
           Edit Department
         </DialogTitle>
 
@@ -290,7 +383,8 @@ function DepartmentsPage() {
             name="name"
             fullWidth
             value={
-              formData.name || ""
+              formData.name ||
+              ""
             }
             onChange={
               handleChange
@@ -303,7 +397,8 @@ function DepartmentsPage() {
             name="code"
             fullWidth
             value={
-              formData.code || ""
+              formData.code ||
+              ""
             }
             onChange={
               handleChange
@@ -321,6 +416,7 @@ function DepartmentsPage() {
           </Button>
 
           <Button
+            variant="contained"
             onClick={
               handleUpdate
             }

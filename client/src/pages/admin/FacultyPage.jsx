@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import API from "../../api/axios";
+
 import {
   Box,
   Button,
@@ -16,8 +19,9 @@ import {
   MenuItem,
 } from "@mui/material";
 
-import { useEffect, useState } from "react";
-import API from "../../api/axios";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function FacultyPage() {
   const [faculty, setFaculty] = useState([]);
@@ -126,7 +130,6 @@ function FacultyPage() {
         );
 
         setEditOpen(false);
-
         loadFaculty();
       } catch (err) {
         alert(
@@ -140,7 +143,7 @@ function FacultyPage() {
     async (id) => {
       if (
         !window.confirm(
-          "Delete faculty?"
+          "Delete this faculty?"
         )
       )
         return;
@@ -161,44 +164,91 @@ function FacultyPage() {
 
   return (
     <Box>
-      <Typography
-        variant="h3"
-        gutterBottom
-      >
-        Faculty
-      </Typography>
+      {/* Header */}
 
-      <Button
-        variant="contained"
-        sx={{ mb: 2 }}
-        onClick={() =>
-          setOpen(true)
-        }
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
       >
-        Add Faculty
-      </Button>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+        >
+          Faculty Management
+        </Typography>
 
-      <Paper>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() =>
+            setOpen(true)
+          }
+        >
+          Add Faculty
+        </Button>
+      </Box>
+
+      {/* Table */}
+
+      <Paper
+        elevation={4}
+        sx={{
+          borderRadius: 3,
+          overflow: "hidden",
+        }}
+      >
         <Table>
-          <TableHead>
+          <TableHead
+            sx={{
+              backgroundColor:
+                "#1976d2",
+            }}
+          >
             <TableRow>
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Employee ID
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Name
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Email
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Department
               </TableCell>
 
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Actions
               </TableCell>
             </TableRow>
@@ -206,7 +256,10 @@ function FacultyPage() {
 
           <TableBody>
             {faculty.map((f) => (
-              <TableRow key={f.id}>
+              <TableRow
+                key={f.id}
+                hover
+              >
                 <TableCell>
                   {f.empId}
                 </TableCell>
@@ -216,9 +269,7 @@ function FacultyPage() {
                 </TableCell>
 
                 <TableCell>
-                  {
-                    f.user?.email
-                  }
+                  {f.user?.email}
                 </TableCell>
 
                 <TableCell>
@@ -230,6 +281,12 @@ function FacultyPage() {
 
                 <TableCell>
                   <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={
+                      <EditIcon />
+                    }
+                    sx={{ mr: 1 }}
                     onClick={() =>
                       openEdit(f)
                     }
@@ -238,7 +295,12 @@ function FacultyPage() {
                   </Button>
 
                   <Button
+                    variant="outlined"
                     color="error"
+                    size="small"
+                    startIcon={
+                      <DeleteIcon />
+                    }
                     onClick={() =>
                       handleDelete(
                         f.id
@@ -261,8 +323,18 @@ function FacultyPage() {
         onClose={() =>
           setOpen(false)
         }
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>
+        <DialogTitle
+          sx={{
+            bgcolor:
+              "#1976d2",
+            color: "white",
+            fontWeight:
+              "bold",
+          }}
+        >
           Add Faculty
         </DialogTitle>
 
@@ -320,6 +392,7 @@ function FacultyPage() {
           </Button>
 
           <Button
+            variant="contained"
             onClick={
               handleAdd
             }
@@ -336,8 +409,18 @@ function FacultyPage() {
         onClose={() =>
           setEditOpen(false)
         }
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>
+        <DialogTitle
+          sx={{
+            bgcolor:
+              "#1976d2",
+            color: "white",
+            fontWeight:
+              "bold",
+          }}
+        >
           Edit Faculty
         </DialogTitle>
 
@@ -393,6 +476,7 @@ function FacultyPage() {
           </Button>
 
           <Button
+            variant="contained"
             onClick={
               handleUpdate
             }

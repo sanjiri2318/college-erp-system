@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import API from "../../api/axios";
+
 import {
   Box,
   Button,
@@ -16,16 +19,16 @@ import {
   MenuItem,
 } from "@mui/material";
 
-import { useEffect, useState } from "react";
-import API from "../../api/axios";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-function Students() {
+function StudentsPage() {
   const [students, setStudents] = useState([]);
   const [departments, setDepartments] = useState([]);
 
   const [open, setOpen] = useState(false);
-  const [editOpen, setEditOpen] =
-    useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const [selectedStudent, setSelectedStudent] =
     useState(null);
@@ -41,12 +44,8 @@ function Students() {
 
   const loadStudents = async () => {
     try {
-      const res =
-        await API.get("/students");
-
-      setStudents(
-        res.data.data.students
-      );
+      const res = await API.get("/students");
+      setStudents(res.data.data.students);
     } catch (err) {
       console.log(err);
     }
@@ -129,7 +128,6 @@ function Students() {
         );
 
         setEditOpen(false);
-
         loadStudents();
       } catch (err) {
         alert(
@@ -143,7 +141,7 @@ function Students() {
     async (id) => {
       if (
         !window.confirm(
-          "Delete student?"
+          "Delete this student?"
         )
       )
         return;
@@ -164,43 +162,100 @@ function Students() {
 
   return (
     <Box>
-      <Typography
-        variant="h3"
-        gutterBottom
-      >
-        Students
-      </Typography>
+      {/* Header */}
 
-      <Button
-        variant="contained"
-        onClick={() =>
-          setOpen(true)
-        }
-        sx={{ mb: 2 }}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
       >
-        Add Student
-      </Button>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+        >
+          Students Management
+        </Typography>
 
-      <Paper>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() =>
+            setOpen(true)
+          }
+        >
+          Add Student
+        </Button>
+      </Box>
+
+      {/* Table */}
+
+      <Paper
+        elevation={4}
+        sx={{
+          borderRadius: 3,
+          overflow: "hidden",
+        }}
+      >
         <Table>
-          <TableHead>
+          <TableHead
+            sx={{
+              backgroundColor:
+                "#1976d2",
+            }}
+          >
             <TableRow>
-              <TableCell>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Reg Number
               </TableCell>
-              <TableCell>
+
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Name
               </TableCell>
-              <TableCell>
+
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Email
               </TableCell>
-              <TableCell>
+
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Semester
               </TableCell>
-              <TableCell>
+
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Department
               </TableCell>
-              <TableCell>
+
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
                 Actions
               </TableCell>
             </TableRow>
@@ -211,6 +266,7 @@ function Students() {
               (student) => (
                 <TableRow
                   key={student.id}
+                  hover
                 >
                   <TableCell>
                     {
@@ -245,6 +301,12 @@ function Students() {
 
                   <TableCell>
                     <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={
+                        <EditIcon />
+                      }
+                      sx={{ mr: 1 }}
                       onClick={() =>
                         openEdit(
                           student
@@ -255,7 +317,12 @@ function Students() {
                     </Button>
 
                     <Button
+                      variant="outlined"
                       color="error"
+                      size="small"
+                      startIcon={
+                        <DeleteIcon />
+                      }
                       onClick={() =>
                         handleDelete(
                           student.id
@@ -279,8 +346,18 @@ function Students() {
         onClose={() =>
           setOpen(false)
         }
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>
+        <DialogTitle
+          sx={{
+            bgcolor:
+              "#1976d2",
+            color: "white",
+            fontWeight:
+              "bold",
+          }}
+        >
           Add Student
         </DialogTitle>
 
@@ -358,6 +435,7 @@ function Students() {
           </Button>
 
           <Button
+            variant="contained"
             onClick={
               handleAddStudent
             }
@@ -374,8 +452,18 @@ function Students() {
         onClose={() =>
           setEditOpen(false)
         }
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>
+        <DialogTitle
+          sx={{
+            bgcolor:
+              "#1976d2",
+            color: "white",
+            fontWeight:
+              "bold",
+          }}
+        >
           Edit Student
         </DialogTitle>
 
@@ -386,7 +474,8 @@ function Students() {
             name="name"
             fullWidth
             value={
-              formData.name || ""
+              formData.name ||
+              ""
             }
             onChange={
               handleChange
@@ -458,6 +547,7 @@ function Students() {
           </Button>
 
           <Button
+            variant="contained"
             onClick={
               handleUpdate
             }
@@ -470,4 +560,4 @@ function Students() {
   );
 }
 
-export default Students;
+export default StudentsPage;
