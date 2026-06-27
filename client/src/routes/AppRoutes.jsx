@@ -1,21 +1,30 @@
 import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "../pages/auth/LoginPage";
-import AdminDashboard from "../pages/admin/AdminDashboard";
-import FacultyDashboard from "../pages/faculty/FacultyDashboard";
-import StudentDashboard from "../pages/student/StudentDashboard";
-import MySubjects from "../pages/faculty/MySubjects";
-import FacultyAttendance from "../pages/faculty/FacultyAttendance";
-import FacultyMarks from "../pages/faculty/FacultyMarks";
-import StudentSubjects from "../pages/student/StudentSubjects";
-import StudentAttendance from "../pages/student/StudentAttendance";
-import StudentMarks from "../pages/student/StudentMarks";
 import ChangePassword from "../pages/ChangePassword";
+import Profile from "../pages/Profile";
+
+// Admin Pages
+import AdminDashboard from "../pages/admin/AdminDashboard";
 import StudentsPage from "../pages/admin/StudentsPage";
 import FacultyPage from "../pages/admin/FacultyPage";
 import DepartmentsPage from "../pages/admin/DepartmentsPage";
 import SubjectsPage from "../pages/admin/SubjectsPage";
-import Profile from "../pages/Profile";
+import TimetablePage from "../pages/admin/TimetablePage";
+
+// Faculty Pages
+import FacultyDashboard from "../pages/faculty/FacultyDashboard";
+import MySubjects from "../pages/faculty/MySubjects";
+import FacultyAttendance from "../pages/faculty/FacultyAttendance";
+import FacultyMarks from "../pages/faculty/FacultyMarks";
+import MyTimetable from "../pages/faculty/MyTimetable";
+
+// Student Pages
+import StudentDashboard from "../pages/student/StudentDashboard";
+import StudentSubjects from "../pages/student/StudentSubjects";
+import StudentAttendance from "../pages/student/StudentAttendance";
+import StudentMarks from "../pages/student/StudentMarks";
+import StudentTimetable from "../pages/student/StudentTimetable";
 
 import ProtectedRoute from "./ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -35,7 +44,17 @@ function AppRoutes() {
       {/* Dashboard Layout */}
       <Route element={<DashboardLayout />}>
 
-        {/* Admin */}
+        {/* Profile */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= ADMIN ================= */}
         <Route
           path="/admin"
           element={
@@ -46,15 +65,51 @@ function AppRoutes() {
         />
 
         <Route
-          path="/profile"
+          path="/admin/students"
           element={
-            <ProtectedRoute>
-              <Profile />
+            <ProtectedRoute allowedRole="ADMIN">
+              <StudentsPage />
             </ProtectedRoute>
           }
         />
 
-        {/* Faculty */}
+        <Route
+          path="/admin/faculty"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <FacultyPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/departments"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <DepartmentsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/subjects"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <SubjectsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/timetable"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <TimetablePage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= FACULTY ================= */}
         <Route
           path="/faculty"
           element={
@@ -91,7 +146,16 @@ function AppRoutes() {
           }
         />
 
-        {/* Student */}
+        <Route
+          path="/faculty/timetable"
+          element={
+            <ProtectedRoute allowedRole="FACULTY">
+              <MyTimetable />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= STUDENT ================= */}
         <Route
           path="/student"
           element={
@@ -129,37 +193,10 @@ function AppRoutes() {
         />
 
         <Route
-          path="/admin/students"
+          path="/student/timetable"
           element={
-            <ProtectedRoute allowedRole="ADMIN">
-              <StudentsPage />
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/admin/faculty"
-          element={
-            <ProtectedRoute allowedRole="ADMIN">
-              <FacultyPage />
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/admin/departments"
-          element={
-            <ProtectedRoute allowedRole="ADMIN">
-              <DepartmentsPage />
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/admin/subjects"
-          element={
-            <ProtectedRoute allowedRole="ADMIN">
-              <SubjectsPage />
+            <ProtectedRoute allowedRole="STUDENT">
+              <StudentTimetable />
             </ProtectedRoute>
           }
         />

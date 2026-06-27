@@ -17,22 +17,29 @@ import {
   DialogActions,
   TextField,
   MenuItem,
+  Grid,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
 
 function FacultyPage() {
   const [faculty, setFaculty] = useState([]);
-  const [departments, setDepartments] = useState([]);
+  const [departments, setDepartments] =
+    useState([]);
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] =
+    useState(false);
+
   const [editOpen, setEditOpen] =
     useState(false);
 
-  const [selectedFaculty, setSelectedFaculty] =
-    useState(null);
+  const [
+    selectedFaculty,
+    setSelectedFaculty,
+  ] = useState(null);
 
   const [formData, setFormData] =
     useState({
@@ -40,6 +47,15 @@ function FacultyPage() {
       email: "",
       departmentId: "",
     });
+
+  // NEW STATES
+  const [search, setSearch] =
+    useState("");
+
+  const [
+    departmentFilter,
+    setDepartmentFilter,
+  ] = useState("");
 
   const loadFaculty = async () => {
     try {
@@ -130,6 +146,7 @@ function FacultyPage() {
         );
 
         setEditOpen(false);
+
         loadFaculty();
       } catch (err) {
         alert(
@@ -162,10 +179,40 @@ function FacultyPage() {
       }
     };
 
-  return (
+  // SEARCH + FILTER
+  const filteredFaculty =
+    faculty.filter((f) => {
+      const matchesSearch =
+        f.name
+          ?.toLowerCase()
+          .includes(
+            search.toLowerCase()
+          ) ||
+        f.empId
+          ?.toLowerCase()
+          .includes(
+            search.toLowerCase()
+          ) ||
+        f.user?.email
+          ?.toLowerCase()
+          .includes(
+            search.toLowerCase()
+          );
+
+      const matchesDepartment =
+        !departmentFilter ||
+        f.departmentId ===
+          departmentFilter;
+
+      return (
+        matchesSearch &&
+        matchesDepartment
+      );
+    });
+
+      return (
     <Box>
       {/* Header */}
-
       <Box
         display="flex"
         justifyContent="space-between"
@@ -190,8 +237,77 @@ function FacultyPage() {
         </Button>
       </Box>
 
-      {/* Table */}
+      {/* Search & Filter */}
+      <Grid
+        container
+        spacing={2}
+        sx={{ mb: 3 }}
+      >
+        <Grid
+          item
+          xs={12}
+          md={6}
+        >
+          <TextField
+            fullWidth
+            label="Search Faculty"
+            placeholder="Name, Employee ID or Email"
+            value={search}
+            onChange={(e) =>
+              setSearch(
+                e.target.value
+              )
+            }
+            InputProps={{
+              startAdornment: (
+                <SearchIcon
+                  sx={{
+                    mr: 1,
+                    color: "gray",
+                  }}
+                />
+              ),
+            }}
+          />
+        </Grid>
 
+        <Grid
+          item
+          xs={12}
+          md={6}
+        >
+          <TextField
+            select
+            fullWidth
+            label="Department"
+            value={
+              departmentFilter
+            }
+            onChange={(e) =>
+              setDepartmentFilter(
+                e.target.value
+              )
+            }
+          >
+            <MenuItem value="">
+              All Departments
+            </MenuItem>
+
+            {departments.map(
+              (d) => (
+                <MenuItem
+                  key={d.id}
+                  value={d.id}
+                >
+                  {d.name}
+                </MenuItem>
+              )
+            )}
+          </TextField>
+        </Grid>
+      </Grid>
+
+      {/* Table */}
       <Paper
         elevation={4}
         sx={{
@@ -210,7 +326,8 @@ function FacultyPage() {
               <TableCell
                 sx={{
                   color: "white",
-                  fontWeight: "bold",
+                  fontWeight:
+                    "bold",
                 }}
               >
                 Employee ID
@@ -219,7 +336,8 @@ function FacultyPage() {
               <TableCell
                 sx={{
                   color: "white",
-                  fontWeight: "bold",
+                  fontWeight:
+                    "bold",
                 }}
               >
                 Name
@@ -228,7 +346,8 @@ function FacultyPage() {
               <TableCell
                 sx={{
                   color: "white",
-                  fontWeight: "bold",
+                  fontWeight:
+                    "bold",
                 }}
               >
                 Email
@@ -237,7 +356,8 @@ function FacultyPage() {
               <TableCell
                 sx={{
                   color: "white",
-                  fontWeight: "bold",
+                  fontWeight:
+                    "bold",
                 }}
               >
                 Department
@@ -246,7 +366,8 @@ function FacultyPage() {
               <TableCell
                 sx={{
                   color: "white",
-                  fontWeight: "bold",
+                  fontWeight:
+                    "bold",
                 }}
               >
                 Actions
@@ -255,86 +376,82 @@ function FacultyPage() {
           </TableHead>
 
           <TableBody>
-            {faculty.map((f) => (
-              <TableRow
-                key={f.id}
-                hover
-              >
-                <TableCell>
-                  {f.empId}
-                </TableCell>
+            {filteredFaculty.map(
+              (f) => (
+                <TableRow
+                  key={f.id}
+                  hover
+                >
+                  <TableCell>
+                    {f.empId}
+                  </TableCell>
 
-                <TableCell>
-                  {f.name}
-                </TableCell>
+                  <TableCell>
+                    {f.name}
+                  </TableCell>
 
-                <TableCell>
-                  {f.user?.email}
-                </TableCell>
-
-                <TableCell>
-                  {
-                    f.department
-                      ?.code
-                  }
-                </TableCell>
-
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={
-                      <EditIcon />
+                  <TableCell>
+                    {
+                      f.user
+                        ?.email
                     }
-                    sx={{ mr: 1 }}
-                    onClick={() =>
-                      openEdit(f)
-                    }
-                  >
-                    Edit
-                  </Button>
+                  </TableCell>
 
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    startIcon={
-                      <DeleteIcon />
+                  <TableCell>
+                    {
+                      f
+                        .department
+                        ?.code
                     }
-                    onClick={() =>
-                      handleDelete(
-                        f.id
-                      )
-                    }
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={
+                        <EditIcon />
+                      }
+                      sx={{
+                        mr: 1,
+                      }}
+                      onClick={() =>
+                        openEdit(
+                          f
+                        )
+                      }
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={
+                        <DeleteIcon />
+                      }
+                      onClick={() =>
+                        handleDelete(
+                          f.id
+                        )
+                      }
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )
+            )}
           </TableBody>
         </Table>
       </Paper>
-
-      {/* Add Faculty */}
-
+            {/* Add Faculty Dialog */}
       <Dialog
         open={open}
-        onClose={() =>
-          setOpen(false)
-        }
-        maxWidth="sm"
-        fullWidth
+        onClose={() => setOpen(false)}
       >
-        <DialogTitle
-          sx={{
-            bgcolor:
-              "#1976d2",
-            color: "white",
-            fontWeight:
-              "bold",
-          }}
-        >
+        <DialogTitle>
           Add Faculty
         </DialogTitle>
 
@@ -344,9 +461,7 @@ function FacultyPage() {
             label="Name"
             name="name"
             fullWidth
-            onChange={
-              handleChange
-            }
+            onChange={handleChange}
           />
 
           <TextField
@@ -354,9 +469,7 @@ function FacultyPage() {
             label="Email"
             name="email"
             fullWidth
-            onChange={
-              handleChange
-            }
+            onChange={handleChange}
           />
 
           <TextField
@@ -365,20 +478,16 @@ function FacultyPage() {
             label="Department"
             name="departmentId"
             fullWidth
-            onChange={
-              handleChange
-            }
+            onChange={handleChange}
           >
-            {departments.map(
-              (d) => (
-                <MenuItem
-                  key={d.id}
-                  value={d.id}
-                >
-                  {d.name}
-                </MenuItem>
-              )
-            )}
+            {departments.map((d) => (
+              <MenuItem
+                key={d.id}
+                value={d.id}
+              >
+                {d.name}
+              </MenuItem>
+            ))}
           </TextField>
         </DialogContent>
 
@@ -393,34 +502,21 @@ function FacultyPage() {
 
           <Button
             variant="contained"
-            onClick={
-              handleAdd
-            }
+            onClick={handleAdd}
           >
             Save
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Edit Faculty */}
-
+      {/* Edit Faculty Dialog */}
       <Dialog
         open={editOpen}
         onClose={() =>
           setEditOpen(false)
         }
-        maxWidth="sm"
-        fullWidth
       >
-        <DialogTitle
-          sx={{
-            bgcolor:
-              "#1976d2",
-            color: "white",
-            fontWeight:
-              "bold",
-          }}
-        >
+        <DialogTitle>
           Edit Faculty
         </DialogTitle>
 
@@ -431,12 +527,9 @@ function FacultyPage() {
             name="name"
             fullWidth
             value={
-              formData.name ||
-              ""
+              formData.name || ""
             }
-            onChange={
-              handleChange
-            }
+            onChange={handleChange}
           />
 
           <TextField
@@ -449,20 +542,16 @@ function FacultyPage() {
               formData.departmentId ||
               ""
             }
-            onChange={
-              handleChange
-            }
+            onChange={handleChange}
           >
-            {departments.map(
-              (d) => (
-                <MenuItem
-                  key={d.id}
-                  value={d.id}
-                >
-                  {d.name}
-                </MenuItem>
-              )
-            )}
+            {departments.map((d) => (
+              <MenuItem
+                key={d.id}
+                value={d.id}
+              >
+                {d.name}
+              </MenuItem>
+            ))}
           </TextField>
         </DialogContent>
 
@@ -477,9 +566,7 @@ function FacultyPage() {
 
           <Button
             variant="contained"
-            onClick={
-              handleUpdate
-            }
+            onClick={handleUpdate}
           >
             Update
           </Button>

@@ -47,6 +47,7 @@ const subjectRoutes = require('./src/routes/subject.routes');
 const attendanceRoutes = require('./src/routes/attendance.routes');
 const internalMarkRoutes = require('./src/routes/internalMark.routes');
 const dashboardRoutes = require('./src/routes/dashboard.routes');
+const timetableRoutes = require('./src/routes/timetable.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/departments', departmentRoutes);
@@ -56,6 +57,7 @@ app.use('/api/subjects', subjectRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/internal-marks', internalMarkRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/timetable', timetableRoutes);
 
 // ── 404 Handler ───────────────────────────────────────────────────────────
 

@@ -11,18 +11,37 @@ import {
   Typography,
   Button,
   Box,
-  Drawer,
+  Paper,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
 } from "@mui/material";
 
+function GlassItem({ to, text }) {
+  return (
+    <ListItem disablePadding sx={{ mb: 1 }}>
+      <ListItemButton
+        component={Link}
+        to={to}
+        sx={{
+          borderRadius: "20px",
+          color: "#222",
+          "&:hover": {
+            background:
+              "rgba(255,255,255,0.45)",
+          },
+        }}
+      >
+        <ListItemText primary={text} />
+      </ListItemButton>
+    </ListItem>
+  );
+}
+
 function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const drawerWidth = 220;
 
   const user = JSON.parse(
     localStorage.getItem("user")
@@ -37,38 +56,72 @@ function DashboardLayout() {
     });
   };
 
-  // Hide navbar and sidebar on change password page
   if (
-    location.pathname === "/change-password"
+    location.pathname ===
+    "/change-password"
   ) {
     return <Outlet />;
   }
 
   return (
-    <Box sx={{ display: "flex" }}>
-      {/* Top Navbar */}
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        background:
+          "linear-gradient(135deg,#f8cdda 0%, #f6d365 100%)",
+      }}
+    >
+      {/* Navbar */}
       <AppBar
         position="fixed"
+        elevation={0}
         sx={{
-          zIndex: (theme) =>
-            theme.zIndex.drawer + 1,
+          background:
+            "rgba(255,255,255,0.15)",
+          backdropFilter:
+            "blur(25px)",
+          borderBottom:
+            "1px solid rgba(255,255,255,0.25)",
+          boxShadow:
+            "0 8px 32px rgba(0,0,0,0.1)",
         }}
       >
         <Toolbar>
           <Typography
-            variant="h6"
-            sx={{ flexGrow: 1 }}
+            variant="h5"
+            sx={{
+              flexGrow: 1,
+              fontWeight: "bold",
+              color: "#222",
+            }}
           >
             College ERP
           </Typography>
 
-          <Typography sx={{ mr: 3 }}>
+          <Typography
+            sx={{
+              mr: 3,
+              color: "#222",
+              fontWeight: 600,
+            }}
+          >
             {user?.role}
           </Typography>
 
           <Button
-            color="inherit"
             onClick={logout}
+            sx={{
+              borderRadius: "30px",
+              background:
+                "rgba(255,255,255,0.45)",
+              color: "#222",
+              px: 3,
+              "&:hover": {
+                background:
+                  "rgba(255,255,255,0.7)",
+              },
+            }}
           >
             Logout
           </Button>
@@ -76,208 +129,157 @@ function DashboardLayout() {
       </AppBar>
 
       {/* Sidebar */}
-      <Drawer
-        variant="permanent"
+      <Box
         sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            mt: 8,
-          },
+          width: 280,
+          p: 3,
+          mt: 10,
         }}
       >
-        <List>
-          {/* ADMIN */}
-          {user?.role === "ADMIN" && (
-            <>
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+        <Paper
+          sx={{
+            p: 2,
+            borderRadius: "35px",
+            background:
+              "rgba(255,255,255,0.18)",
+            backdropFilter:
+              "blur(30px)",
+            border:
+              "1px solid rgba(255,255,255,0.3)",
+            boxShadow:
+              "0 8px 32px rgba(0,0,0,0.12)",
+          }}
+        >
+          <List>
+            {/* ADMIN */}
+            {user?.role === "ADMIN" && (
+              <>
+                <GlassItem
                   to="/admin"
-                >
-                  <ListItemText primary="Admin Dashboard" />
-                </ListItemButton>
-              </ListItem>
+                  text="Dashboard"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/admin/students"
-                >
-                  <ListItemText primary="Students" />
-                </ListItemButton>
-              </ListItem>
+                  text="Students"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/admin/faculty"
-                >
-                  <ListItemText primary="Faculty" />
-                </ListItemButton>
-              </ListItem>
+                  text="Faculty"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/admin/departments"
-                >
-                  <ListItemText primary="Departments" />
-                </ListItemButton>
-              </ListItem>
+                  text="Departments"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/admin/subjects"
-                >
-                  <ListItemText primary="Subjects" />
-                </ListItemButton>
-              </ListItem>
+                  text="Subjects"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
-                  to="/change-password"
-                >
-                  <ListItemText primary="Change Password" />
-                </ListItemButton>
-              </ListItem>
+                <GlassItem
+                  to="/admin/timetable"
+                  text="Timetable"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/profile"
-                >
-                  <ListItemText primary="Profile" />
-                </ListItemButton>
-              </ListItem>
+                  text="Profile"
+                />
 
-              
-            </>
-          )}
+                <GlassItem
+                  to="/change-password"
+                  text="Change Password"
+                />
+              </>
+            )}
 
-          {/* FACULTY */}
-          {user?.role === "FACULTY" && (
-            <>
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+            {/* FACULTY */}
+            {user?.role ===
+              "FACULTY" && (
+              <>
+                <GlassItem
                   to="/faculty"
-                >
-                  <ListItemText primary="Faculty Dashboard" />
-                </ListItemButton>
-              </ListItem>
+                  text="Dashboard"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/faculty/subjects"
-                >
-                  <ListItemText primary="My Subjects" />
-                </ListItemButton>
-              </ListItem>
+                  text="My Subjects"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/faculty/attendance"
-                >
-                  <ListItemText primary="Attendance" />
-                </ListItemButton>
-              </ListItem>
+                  text="Attendance"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/faculty/marks"
-                >
-                  <ListItemText primary="Internal Marks" />
-                </ListItemButton>
-              </ListItem>
+                  text="Internal Marks"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
+                  to="/faculty/timetable"
+                  text="My Timetable"
+                />
+
+                <GlassItem
                   to="/profile"
-                >
-                  <ListItemText primary="Profile" />
-                </ListItemButton>
-              </ListItem>
+                  text="Profile"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/change-password"
-                >
-                  <ListItemText primary="Change Password" />
-                </ListItemButton>
-              </ListItem>
-            </>
-          )}
+                  text="Change Password"
+                />
+              </>
+            )}
 
-          {/* STUDENT */}
-          {user?.role === "STUDENT" && (
-            <>
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+            {/* STUDENT */}
+            {user?.role ===
+              "STUDENT" && (
+              <>
+                <GlassItem
                   to="/student"
-                >
-                  <ListItemText primary="Student Dashboard" />
-                </ListItemButton>
-              </ListItem>
+                  text="Dashboard"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/student/subjects"
-                >
-                  <ListItemText primary="My Subjects" />
-                </ListItemButton>
-              </ListItem>
+                  text="My Subjects"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/student/attendance"
-                >
-                  <ListItemText primary="Attendance" />
-                </ListItemButton>
-              </ListItem>
+                  text="Attendance"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/student/marks"
-                >
-                  <ListItemText primary="Internal Marks" />
-                </ListItemButton>
-              </ListItem>
+                  text="Internal Marks"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
+                  to="/student/timetable"
+                  text="Timetable"
+                />
+
+                <GlassItem
                   to="/profile"
-                >
-                  <ListItemText primary="Profile" />
-                </ListItemButton>
-              </ListItem>
+                  text="Profile"
+                />
 
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
+                <GlassItem
                   to="/change-password"
-                >
-                  <ListItemText primary="Change Password" />
-                </ListItemButton>
-              </ListItem>
-            </>
-          )}
-        </List>
-      </Drawer>
+                  text="Change Password"
+                />
+              </>
+            )}
+          </List>
+        </Paper>
+      </Box>
 
       {/* Main Content */}
       <Box
@@ -285,10 +287,7 @@ function DashboardLayout() {
         sx={{
           flexGrow: 1,
           p: 4,
-          mt: 8,
-          width: `calc(100% - ${drawerWidth}px)`,
-          minHeight: "100vh",
-          backgroundColor: "#f5f5f5",
+          mt: 10,
         }}
       >
         <Outlet />

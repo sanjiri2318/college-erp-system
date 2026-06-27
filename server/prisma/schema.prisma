@@ -13,6 +13,15 @@ enum Role {
   STUDENT
 }
 
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
 model User {
   id                 Int      @id @default(autoincrement())
   email              String   @unique
@@ -32,9 +41,10 @@ model Department {
   name String
   code String @unique
 
-  students Student[]
-  faculty  Faculty[]
-  subjects Subject[]
+  students   Student[]
+  faculty    Faculty[]
+  subjects   Subject[]
+  timetables Timetable[]
 }
 
 model Student {
@@ -65,7 +75,8 @@ model Faculty {
   user       User       @relation(fields: [userId], references: [id])
   department Department @relation(fields: [departmentId], references: [id])
 
-  subjects Subject[]
+  subjects   Subject[]
+  timetables Timetable[]
 }
 
 model Subject {
@@ -82,6 +93,7 @@ model Subject {
 
   attendances Attendance[]
   marks       InternalMark[]
+  timetables  Timetable[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,4 +131,27 @@ model InternalMark {
   updatedAt DateTime @updatedAt
 
   @@unique([studentId, subjectId, internalNumber])
+}
+
+model Timetable {
+  id Int @id @default(autoincrement())
+
+  day        Day
+  period     Int
+  roomNumber String?
+
+  semester Int
+
+  departmentId Int
+  subjectId    Int
+  facultyId    Int
+
+  department Department @relation(fields: [departmentId], references: [id])
+  subject    Subject    @relation(fields: [subjectId], references: [id])
+  faculty    Faculty    @relation(fields: [facultyId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([day, period, departmentId, semester])
 }
