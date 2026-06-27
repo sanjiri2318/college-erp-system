@@ -70,6 +70,8 @@ const FacultyMarks = () => {
     studentId,
     value
   ) => {
+    if (value > 100) return;
+
     setMarks((prev) => ({
       ...prev,
       [studentId]: value,
@@ -77,28 +79,68 @@ const FacultyMarks = () => {
   };
 
   const handleSave = async () => {
-    try {
-      const res =
-        await saveInternalMarks({
-          subjectId,
-          internalNumber,
-          marks,
-        });
+    if (!subjectId) {
+      alert("Please select a subject.");
+      return;
+    }
 
-      alert(res.message);
+    try {
+      for (const studentId in marks) {
+        const mark =
+          marks[studentId];
+
+        if (
+          mark === "" ||
+          mark === null
+        ) {
+          continue;
+        }
+
+        await saveInternalMarks({
+          studentId:
+            Number(studentId),
+          subjectId:
+            Number(subjectId),
+          internalNumber:
+            Number(
+              internalNumber
+            ),
+          marksObtained:
+            Number(mark),
+        });
+      }
+
+      alert(
+        "Marks saved successfully."
+      );
     } catch (error) {
       console.log(error);
+
+      alert(
+        error.response?.data
+          ?.message ||
+          "Failed to save marks."
+      );
     }
   };
 
   return (
     <Box p={4}>
-      <Typography variant="h4" mb={4}>
+      <Typography
+        variant="h4"
+        mb={4}
+      >
         Internal Marks
       </Typography>
 
-      <Box display="flex" gap={3}>
-        <FormControl sx={{ minWidth: 250 }}>
+      <Box
+        display="flex"
+        gap={3}
+        flexWrap="wrap"
+      >
+        <FormControl
+          sx={{ minWidth: 250 }}
+        >
           <InputLabel>
             Select Subject
           </InputLabel>
@@ -106,26 +148,38 @@ const FacultyMarks = () => {
           <Select
             value={subjectId}
             label="Select Subject"
-            onChange={handleSubjectChange}
+            onChange={
+              handleSubjectChange
+            }
           >
-            {subjects.map((subject) => (
-              <MenuItem
-                key={subject.id}
-                value={subject.id}
-              >
-                {subject.name}
-              </MenuItem>
-            ))}
+            {subjects.map(
+              (subject) => (
+                <MenuItem
+                  key={
+                    subject.id
+                  }
+                  value={
+                    subject.id
+                  }
+                >
+                  {subject.name}
+                </MenuItem>
+              )
+            )}
           </Select>
         </FormControl>
 
-        <FormControl sx={{ minWidth: 200 }}>
+        <FormControl
+          sx={{ minWidth: 200 }}
+        >
           <InputLabel>
             Internal Number
           </InputLabel>
 
           <Select
-            value={internalNumber}
+            value={
+              internalNumber
+            }
             label="Internal Number"
             onChange={(e) =>
               setInternalNumber(
@@ -136,9 +190,11 @@ const FacultyMarks = () => {
             <MenuItem value={1}>
               Internal 1
             </MenuItem>
+
             <MenuItem value={2}>
               Internal 2
             </MenuItem>
+
             <MenuItem value={3}>
               Internal 3
             </MenuItem>
@@ -155,9 +211,11 @@ const FacultyMarks = () => {
                   <TableCell>
                     Reg Number
                   </TableCell>
+
                   <TableCell>
                     Name
                   </TableCell>
+
                   <TableCell>
                     Marks
                   </TableCell>
@@ -165,37 +223,53 @@ const FacultyMarks = () => {
               </TableHead>
 
               <TableBody>
-                {students.map((student) => (
-                  <TableRow
-                    key={student.id}
-                  >
-                    <TableCell>
-                      {student.regNumber}
-                    </TableCell>
-
-                    <TableCell>
-                      {student.name}
-                    </TableCell>
-
-                    <TableCell>
-                      <TextField
-                        type="number"
-                        value={
-                          marks[
-                            student.id
-                          ] || ""
+                {students.map(
+                  (student) => (
+                    <TableRow
+                      key={
+                        student.id
+                      }
+                    >
+                      <TableCell>
+                        {
+                          student.regNumber
                         }
-                        onChange={(e) =>
-                          handleMarkChange(
-                            student.id,
-                            e.target.value
-                          )
+                      </TableCell>
+
+                      <TableCell>
+                        {
+                          student.name
                         }
-                        size="small"
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+
+                      <TableCell>
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={
+                            marks[
+                              student
+                                .id
+                            ] || ""
+                          }
+                          inputProps={{
+                            min: 0,
+                            max: 100,
+                          }}
+                          onChange={(
+                            e
+                          ) =>
+                            handleMarkChange(
+                              student.id,
+                              e.target
+                                .value
+                            )
+                          }
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )
+                )}
               </TableBody>
             </Table>
           </Paper>
@@ -203,7 +277,9 @@ const FacultyMarks = () => {
           <Button
             variant="contained"
             sx={{ mt: 3 }}
-            onClick={handleSave}
+            onClick={
+              handleSave
+            }
           >
             Save Marks
           </Button>

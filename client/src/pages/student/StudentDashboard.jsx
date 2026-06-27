@@ -16,54 +16,94 @@ import { getStudentDashboard } from "../../api/studentApi";
 
 function StudentDashboard() {
   const [dashboard, setDashboard] = useState({
-    subjectCount: 0,
-    attendanceCount: 0,
-    marksCount: 0,
+    studentName: "",
+    regNumber: "",
     semester: 0,
+    totalSubjects: 0,
+    attendancePercentage: 0,
+    averageMarks: 0,
   });
 
   useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const res = await getStudentDashboard();
-        console.log("Student Dashboard:", res);
-
-        setDashboard(res.dashboard);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
     fetchDashboard();
   }, []);
+
+  const fetchDashboard = async () => {
+    try {
+      const res = await getStudentDashboard();
+
+      console.log(
+        "Student Dashboard Full Response:",
+        res
+      );
+
+      // Handle all possible response structures
+      if (res?.data) {
+        setDashboard(res.data);
+      } else if (res?.dashboard) {
+        setDashboard(res.dashboard);
+      } else {
+        setDashboard(res);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const cards = [
     {
       title: "Current Semester",
-      value: dashboard.semester,
-      icon: <SchoolIcon sx={{ fontSize: 40 }} />,
+      value: dashboard?.semester ?? 0,
+      icon: (
+        <SchoolIcon sx={{ fontSize: 40 }} />
+      ),
     },
     {
       title: "Subjects",
-      value: dashboard.subjectCount,
-      icon: <MenuBookIcon sx={{ fontSize: 40 }} />,
+      value: dashboard?.totalSubjects ?? 0,
+      icon: (
+        <MenuBookIcon sx={{ fontSize: 40 }} />
+      ),
     },
     {
-      title: "Attendance Records",
-      value: dashboard.attendanceCount,
-      icon: <FactCheckIcon sx={{ fontSize: 40 }} />,
+      title: "Attendance %",
+      value: `${
+        dashboard?.attendancePercentage ?? 0
+      }%`,
+      icon: (
+        <FactCheckIcon
+          sx={{ fontSize: 40 }}
+        />
+      ),
     },
     {
-      title: "Internal Marks",
-      value: dashboard.marksCount,
-      icon: <AssignmentIcon sx={{ fontSize: 40 }} />,
+      title: "Average Marks",
+      value: dashboard?.averageMarks ?? 0,
+      icon: (
+        <AssignmentIcon
+          sx={{ fontSize: 40 }}
+        />
+      ),
     },
   ];
 
   return (
     <Box p={4}>
-      <Typography variant="h4" fontWeight="bold" mb={4}>
-        Student Dashboard
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        mb={1}
+      >
+        Welcome,{" "}
+        {dashboard?.studentName || "Student"}
+      </Typography>
+
+      <Typography
+        color="text.secondary"
+        mb={4}
+      >
+        Registration Number:{" "}
+        {dashboard?.regNumber || "-"}
       </Typography>
 
       <Grid container spacing={3}>

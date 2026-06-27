@@ -33,7 +33,7 @@ export const getFacultySubjects =
 
 export const getStudentsBySubject =
   async (subjectId) => {
-    // Get selected subject
+    // Get subject details
     const subjectRes = await API.get(
       `/subjects/${subjectId}`
     );
@@ -41,8 +41,7 @@ export const getStudentsBySubject =
     const subject =
       subjectRes.data.data.subject;
 
-    // Get students of that department
-    // and semester
+    // Get students from same department and semester
     const studentRes = await API.get(
       `/students/filter?departmentId=${subject.departmentId}&semester=${subject.semester}`
     );
@@ -66,17 +65,26 @@ export const saveAttendance =
 
 export const getStudentsForMarks =
   async (subjectId) => {
-    const res = await API.get(
-      `/faculty/marks/students/${subjectId}`
+    // Get selected subject
+    const subjectRes = await API.get(
+      `/subjects/${subjectId}`
     );
 
-    return res.data;
+    const subject =
+      subjectRes.data.data.subject;
+
+    // Get students from same department and semester
+    const studentRes = await API.get(
+      `/students/filter?departmentId=${subject.departmentId}&semester=${subject.semester}`
+    );
+
+    return studentRes.data.data;
   };
 
 export const saveInternalMarks =
   async (data) => {
     const res = await API.post(
-      "/faculty/marks",
+      "/internal-marks",
       data
     );
 

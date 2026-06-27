@@ -481,7 +481,7 @@ const getStudentDashboard = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const student = await prisma.student.findFirst({
+    const student = await prisma.student.findUnique({
       where: {
         userId,
       },
@@ -494,39 +494,83 @@ const getStudentDashboard = async (req, res) => {
       });
     }
 
-    const subjectCount = await prisma.subject.count({
+    // Total Subjects
+    const totalSubjects = await prisma.subject.count({
       where: {
         semester: student.semester,
         departmentId: student.departmentId,
       },
     });
 
-    const attendanceCount = await prisma.attendance.count({
-      where: {
-        studentId: student.id,
-        status: true,
-      },
-    });
+    // Attendance
+    const totalAttendance =
+      await prisma.attendance.count({
+        where: {
+          studentId: student.id,
+        },
+      });
 
-    const marksCount = await prisma.internalMark.count({
-      where: {
-        studentId: student.id,
-      },
-    });
+    const presentAttendance =
+      await prisma.attendance.count({
+        where: {
+          studentId: student.id,
+          status: true,
+        },
+      });
 
-    res.json({
+    const attendancePercentage =
+      totalAttendance === 0
+        ? 0
+        : Number(
+            (
+              (presentAttendance /
+                totalAttendance) *
+              100
+            ).toFixed(2)
+          );
+
+    // Average Marks
+    const marks =
+      await prisma.internalMark.findMany({
+        where: {
+          studentId: student.id,
+        },
+        select: {
+          marksObtained: true,
+        },
+      });
+
+    let averageMarks = 0;
+
+    if (marks.length > 0) {
+      const totalMarks = marks.reduce(
+        (sum, mark) =>
+          sum + mark.marksObtained,
+        0
+      );
+
+      averageMarks = Number(
+        (totalMarks / marks.length).toFixed(
+          2
+        )
+      );
+    }
+
+    return res.status(200).json({
       success: true,
-      dashboard: {
-        subjectCount,
-        attendanceCount,
-        marksCount,
+      data: {
+        studentName: student.name,
+        regNumber: student.regNumber,
         semester: student.semester,
+        totalSubjects,
+        attendancePercentage,
+        averageMarks,
       },
     });
   } catch (error) {
     console.log(error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Server Error",
     });
