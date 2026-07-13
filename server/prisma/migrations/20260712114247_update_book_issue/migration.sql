@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `bookissue` ADD COLUMN `remarks` VARCHAR(191) NULL,
+    ADD COLUMN `status` ENUM('ISSUED', 'RETURNED', 'OVERDUE') NOT NULL DEFAULT 'ISSUED';

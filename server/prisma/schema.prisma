@@ -22,6 +22,70 @@ enum Day {
   SATURDAY
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum HostelType {
+  BOYS
+  GIRLS
+}
+
+enum FeeType {
+  TUITION
+  HOSTEL
+  TRANSPORT
+  EXAM
+  LIBRARY
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  PAID
+}
+
+enum PaymentMode {
+  CASH
+  UPI
+  CARD
+  NET_BANKING
+}
+
+enum VehicleType {
+  BUS
+  VAN
+}
+
+enum BookStatus {
+  AVAILABLE
+  ISSUED
+  LOST
+  DAMAGED
+}
+
+enum BookCopyStatus {
+  AVAILABLE
+  ISSUED
+  RESERVED
+  LOST
+  DAMAGED
+}
+
+enum BookIssueStatus {
+  ISSUED
+  RETURNED
+  OVERDUE
+}
+
+enum MarkEntryStatus {
+  DRAFT
+  LOCKED
+  PUBLISHED
+}
+
 model User {
   id                 Int      @id @default(autoincrement())
   email              String   @unique
@@ -41,10 +105,11 @@ model Department {
   name String
   code String @unique
 
-  students   Student[]
-  faculty    Faculty[]
-  subjects   Subject[]
-  timetables Timetable[]
+  students      Student[]
+  faculty       Faculty[]
+  subjects      Subject[]
+  timetables    Timetable[]
+  feeStructures FeeStructure[]
 }
 
 model Student {
@@ -54,14 +119,24 @@ model Student {
   semester  Int
   phone     String?
 
+  gender Gender?
+
   userId       Int @unique
   departmentId Int
 
   user       User       @relation(fields: [userId], references: [id])
   department Department @relation(fields: [departmentId], references: [id])
 
-  attendances Attendance[]
-  marks       InternalMark[]
+  attendances         Attendance[]
+  marks               InternalMark[]
+  bookIssues          BookIssue[]
+  examSeatAllocations ExamSeatAllocation[]
+  markEntries         MarkEntry[]
+
+  hostelAllocation HostelAllocation?
+  transport        StudentTransport?
+
+  studentFees StudentFee[]
 }
 
 model Faculty {
@@ -75,8 +150,10 @@ model Faculty {
   user       User       @relation(fields: [userId], references: [id])
   department Department @relation(fields: [departmentId], references: [id])
 
-  subjects   Subject[]
-  timetables Timetable[]
+  subjects      Subject[]
+  timetables    Timetable[]
+  examSchedules ExamSchedule[]
+  markEntries   MarkEntry[]
 }
 
 model Subject {
@@ -91,9 +168,11 @@ model Subject {
   department Department @relation(fields: [departmentId], references: [id])
   faculty    Faculty?   @relation(fields: [facultyId], references: [id])
 
-  attendances Attendance[]
-  marks       InternalMark[]
-  timetables  Timetable[]
+  attendances   Attendance[]
+  marks         InternalMark[]
+  timetables    Timetable[]
+  examSchedules ExamSchedule[]
+  markEntries   MarkEntry[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -154,4 +233,490 @@ model Timetable {
   updatedAt DateTime @updatedAt
 
   @@unique([day, period, departmentId, semester])
+}
+
+model Hostel {
+  id Int @id @default(autoincrement())
+
+  name String
+  code String @unique
+
+  type HostelType
+
+  address String
+
+  wardenName String
+
+  wardenPhone String
+
+  description String?
+
+  blocks HostelBlock[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HostelBlock {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  hostelId Int
+  hostel   Hostel @relation(fields: [hostelId], references: [id])
+
+  rooms HostelRoom[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HostelRoom {
+  id         Int    @id @default(autoincrement())
+  roomNumber String
+  floor      Int
+  capacity   Int
+  price      Float
+
+  hostelBlockId Int
+  hostelBlock   HostelBlock @relation(fields: [hostelBlockId], references: [id])
+
+  beds HostelBed[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([hostelBlockId, roomNumber])
+}
+
+model HostelBed {
+  id     Int     @id @default(autoincrement())
+  bedNo  String
+  status Boolean @default(true)
+
+  hostelRoomId Int
+  hostelRoom   HostelRoom @relation(fields: [hostelRoomId], references: [id])
+
+  allocation HostelAllocation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([hostelRoomId, bedNo])
+}
+
+model HostelAllocation {
+  id Int @id @default(autoincrement())
+
+  studentId   Int @unique
+  hostelBedId Int @unique
+
+  allocatedDate DateTime  @default(now())
+  endDate       DateTime?
+
+  student   Student   @relation(fields: [studentId], references: [id])
+  hostelBed HostelBed @relation(fields: [hostelBedId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FeeCategory {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  feeStructures FeeStructure[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FeeStructure {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  feeType FeeType
+
+  amount Float
+
+  semester Int
+
+  departmentId Int
+  categoryId   Int
+
+  department Department  @relation(fields: [departmentId], references: [id])
+  category   FeeCategory @relation(fields: [categoryId], references: [id])
+
+  studentFees StudentFee[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([departmentId, semester, feeType])
+}
+
+model StudentFee {
+  id Int @id @default(autoincrement())
+
+  studentId      Int
+  feeStructureId Int
+
+  totalAmount Float
+
+  paidAmount Float @default(0)
+
+  dueAmount Float
+
+  status PaymentStatus @default(PENDING)
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  feeStructure FeeStructure @relation(fields: [feeStructureId], references: [id])
+
+  payments FeePayment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, feeStructureId])
+}
+
+model FeePayment {
+  id Int @id @default(autoincrement())
+
+  receiptNo String @unique
+
+  studentFeeId Int
+
+  amount Float
+
+  paymentMode PaymentMode
+
+  transactionId String?
+
+  remarks String?
+
+  paidAt DateTime @default(now())
+
+  studentFee StudentFee @relation(fields: [studentFeeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TransportRoute {
+  id Int @id @default(autoincrement())
+
+  routeName String
+  routeCode String @unique
+
+  startLocation String
+  endLocation   String
+
+  distance Float
+
+  stops TransportStop[]
+  buses TransportBus[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TransportStop {
+  id Int @id @default(autoincrement())
+
+  stopName  String
+  stopOrder Int
+
+  routeId Int
+  route   TransportRoute @relation(fields: [routeId], references: [id])
+
+  students StudentTransport[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([routeId, stopOrder])
+}
+
+model TransportBus {
+  id Int @id @default(autoincrement())
+
+  busNumber String @unique
+
+  vehicleType VehicleType
+
+  capacity Int
+
+  driverName String
+
+  driverPhone String
+
+  routeId Int
+  route   TransportRoute @relation(fields: [routeId], references: [id])
+
+  students StudentTransport[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudentTransport {
+  id Int @id @default(autoincrement())
+
+  studentId Int @unique
+
+  busId Int
+
+  stopId Int
+
+  allocatedDate DateTime @default(now())
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  bus TransportBus @relation(fields: [busId], references: [id])
+
+  stop TransportStop @relation(fields: [stopId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BookCategory {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  books Book[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Author {
+  id Int @id @default(autoincrement())
+
+  name    String
+  email   String?
+  phone   String?
+  country String?
+
+  books Book[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Publisher {
+  id Int @id @default(autoincrement())
+
+  name String @unique
+
+  email String?
+
+  phone String?
+
+  address String?
+
+  books Book[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Book {
+  id Int @id @default(autoincrement())
+
+  title    String
+  isbn     String  @unique
+  edition  String?
+  language String?
+  price    Float
+
+  totalCopies Int @default(0)
+
+  categoryId  Int
+  authorId    Int
+  publisherId Int
+
+  category  BookCategory @relation(fields: [categoryId], references: [id])
+  author    Author       @relation(fields: [authorId], references: [id])
+  publisher Publisher    @relation(fields: [publisherId], references: [id])
+
+  copies BookCopy[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BookCopy {
+  id Int @id @default(autoincrement())
+
+  barcode String @unique
+
+  accessionNumber String @unique
+
+  shelfNumber String?
+
+  rackNumber String?
+
+  purchaseDate DateTime?
+
+  purchasePrice Float?
+
+  status BookCopyStatus @default(AVAILABLE)
+
+  remarks String?
+
+  bookId Int
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  issues    BookIssue[]
+}
+
+model BookIssue {
+  id Int @id @default(autoincrement())
+
+  studentId  Int
+  bookCopyId Int
+
+  issueDate  DateTime  @default(now())
+  dueDate    DateTime
+  returnDate DateTime?
+
+  fine Float @default(0)
+
+  status BookIssueStatus @default(ISSUED)
+
+  remarks String?
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  bookCopy BookCopy @relation(fields: [bookCopyId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExamType {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  examSchedules ExamSchedule[]
+  markEntries   MarkEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExamSchedule {
+  id Int @id @default(autoincrement())
+
+  examTypeId Int
+  subjectId  Int
+  facultyId  Int
+
+  semester Int
+
+  examDate DateTime
+
+  startTime DateTime
+
+  endTime DateTime
+
+  totalMarks Int
+
+  hall String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  examType ExamType @relation(fields: [examTypeId], references: [id])
+
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  faculty             Faculty              @relation(fields: [facultyId], references: [id])
+  examHallAllocations ExamHallAllocation[]
+}
+
+model ExamHall {
+  id Int @id @default(autoincrement())
+
+  name     String @unique
+  building String
+  floor    Int
+  capacity Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  allocations ExamHallAllocation[]
+}
+
+model ExamHallAllocation {
+  id Int @id @default(autoincrement())
+
+  examScheduleId Int
+  examHallId     Int
+
+  allocatedStudents Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  examSchedule ExamSchedule @relation(fields: [examScheduleId], references: [id])
+
+  examHall            ExamHall             @relation(fields: [examHallId], references: [id])
+  examSeatAllocations ExamSeatAllocation[]
+
+  @@unique([examScheduleId, examHallId])
+}
+
+model ExamSeatAllocation {
+  id Int @id @default(autoincrement())
+
+  examHallAllocationId Int
+  studentId            Int
+
+  seatNumber String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  examHallAllocation ExamHallAllocation @relation(fields: [examHallAllocationId], references: [id])
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([examHallAllocationId, studentId])
+  @@unique([examHallAllocationId, seatNumber])
+}
+
+model MarkEntry {
+  id Int @id @default(autoincrement())
+
+  studentId  Int
+  subjectId  Int
+  facultyId  Int
+  examTypeId Int
+
+  marks Int
+
+  status MarkEntryStatus @default(DRAFT)
+
+  remarks String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student  Student  @relation(fields: [studentId], references: [id])
+  subject  Subject  @relation(fields: [subjectId], references: [id])
+  faculty  Faculty  @relation(fields: [facultyId], references: [id])
+  examType ExamType @relation(fields: [examTypeId], references: [id])
+
+  @@unique([studentId, subjectId, examTypeId])
 }

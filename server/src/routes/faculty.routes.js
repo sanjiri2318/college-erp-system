@@ -11,9 +11,12 @@ const {
   deleteFaculty,
   getFacultyDashboard,
   getFacultySubjects,
+} = require("../controllers/faculty.controller");
+
+const {
   getStudentsForMarks,
   saveInternalMarks,
-} = require("../controllers/faculty.controller");
+} = require("../controllers/facultyMarks.controller");
 
 const {
   getStudentsBySubject,

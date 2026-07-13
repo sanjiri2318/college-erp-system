@@ -1,5 +1,48 @@
 import API from "./axios";
 
+/* ===========================
+   ADMIN
+=========================== */
+
+export const getStudents = async (params = {}) => {
+  const res = await API.get("/students", {
+    params,
+  });
+
+  return res.data;
+};
+
+export const getStudentById = async (id) => {
+  const res = await API.get(`/students/${id}`);
+  return res.data;
+};
+
+export const createStudent = async (data) => {
+  const res = await API.post("/students", data);
+  return res.data;
+};
+
+export const updateStudent = async (id, data) => {
+  const res = await API.put(
+    `/students/${id}`,
+    data
+  );
+
+  return res.data;
+};
+
+export const deleteStudent = async (id) => {
+  const res = await API.delete(
+    `/students/${id}`
+  );
+
+  return res.data;
+};
+
+/* ===========================
+   STUDENT PORTAL
+=========================== */
+
 export const getStudentDashboard = async () => {
   const res = await API.get(
     "/students/dashboard"

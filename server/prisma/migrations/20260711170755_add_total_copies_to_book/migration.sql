@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `book` ADD COLUMN `totalCopies` INTEGER NOT NULL DEFAULT 0;

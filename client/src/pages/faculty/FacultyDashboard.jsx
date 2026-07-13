@@ -214,80 +214,66 @@ const FacultyDashboard = () => {
 
             {/* Demo Cards */}
 
-            {[
-              {
-                subject: "Database Management Systems",
-                period: "Period 1",
-                room: "A201",
-              },
-              {
-                subject: "Java Programming",
-                period: "Period 3",
-                room: "B104",
-              },
-            ].map((cls, index) => (
-              <Paper
-                key={index}
-                variant="outlined"
-                sx={{
-                  p: 2,
-                  mb: 2,
-                  borderRadius: 3,
-                }}
-              >
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
+            {dashboard.todayClasses?.length > 0 ? (
+              dashboard.todayClasses.map((cls) => (
+                <Paper
+                  key={cls.id}
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    mb: 2,
+                    borderRadius: 3,
+                  }}
                 >
-                  <Box>
-                    <Typography
-                      fontWeight="bold"
-                    >
-                      {cls.subject}
-                    </Typography>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Box>
+                      <Typography fontWeight="bold">
+                        {cls.subject.name}
+                      </Typography>
 
-                    <Typography
-                      color="text.secondary"
-                    >
-                      {cls.period}
-                    </Typography>
+                      <Typography color="text.secondary">
+                        Period {cls.period}
+                      </Typography>
 
-                    <Typography
-                      color="text.secondary"
-                    >
-                      Room {cls.room}
-                    </Typography>
-                  </Box>
+                      <Typography color="text.secondary">
+                        Room {cls.roomNumber || "-"}
+                      </Typography>
+                    </Box>
 
-                  <Stack spacing={1}>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() =>
-                        navigate(
-                          "/faculty/attendance"
-                        )
-                      }
-                    >
-                      Attendance
-                    </Button>
+                    <Stack spacing={1}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() =>
+                          navigate("/faculty/attendance")
+                        }
+                      >
+                        Attendance
+                      </Button>
 
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() =>
-                        navigate(
-                          "/faculty/marks"
-                        )
-                      }
-                    >
-                      Marks
-                    </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() =>
+                          navigate("/faculty/marks")
+                        }
+                      >
+                        Marks
+                      </Button>
+                    </Stack>
                   </Stack>
-                </Stack>
-              </Paper>
-            ))}
+                </Paper>
+              ))
+            ) : (
+              <Typography color="text.secondary">
+                No classes scheduled today.
+              </Typography>
+)}
+            ))
           </Paper>
         </Grid>
 

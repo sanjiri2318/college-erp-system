@@ -7,6 +7,7 @@ import Profile from "../pages/Profile";
 // Admin Pages
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import StudentsPage from "../pages/admin/StudentsPage";
+import StudentAdmissionPage from "../pages/admin/StudentAdmissionPage";
 import FacultyPage from "../pages/admin/FacultyPage";
 import DepartmentsPage from "../pages/admin/DepartmentsPage";
 import SubjectsPage from "../pages/admin/SubjectsPage";
@@ -55,6 +56,7 @@ function AppRoutes() {
         />
 
         {/* ================= ADMIN ================= */}
+
         <Route
           path="/admin"
           element={
@@ -69,6 +71,15 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRole="ADMIN">
               <StudentsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/students/admission"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <StudentAdmissionPage />
             </ProtectedRoute>
           }
         />
@@ -110,6 +121,7 @@ function AppRoutes() {
         />
 
         {/* ================= FACULTY ================= */}
+
         <Route
           path="/faculty"
           element={
@@ -156,6 +168,7 @@ function AppRoutes() {
         />
 
         {/* ================= STUDENT ================= */}
+
         <Route
           path="/student"
           element={
@@ -200,6 +213,7 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
       </Route>
     </Routes>
   );
