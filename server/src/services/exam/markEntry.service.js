@@ -59,10 +59,11 @@ const createMarkEntry = async (data) => {
   }
 
   const marks = Number(data.marks);
+  const maxMarks = Number(data.maxMarks ?? 100);
 
-  if (marks < 0 || marks > 100) {
+  if (marks < 0 || marks > maxMarks) {
     throw new ConflictError(
-      "Marks must be between 0 and 100."
+      `Marks cannot exceed ${maxMarks}.`
     );
   }
 
@@ -73,6 +74,7 @@ const createMarkEntry = async (data) => {
       facultyId: Number(data.facultyId),
       examTypeId: Number(data.examTypeId),
       marks,
+      maxMarks,
       remarks: data.remarks,
     },
     include: {
@@ -151,12 +153,18 @@ const updateMarkEntry = async (id, data) => {
     );
   }
 
+  const updatedMaxMarks =
+    data.maxMarks !== undefined
+      ? Number(data.maxMarks)
+      : existing.maxMarks;
+
   if (
     data.marks !== undefined &&
-    (Number(data.marks) < 0 || Number(data.marks) > 100)
+    (Number(data.marks) < 0 ||
+      Number(data.marks) > updatedMaxMarks)
   ) {
     throw new ConflictError(
-      "Marks must be between 0 and 100."
+      `Marks cannot exceed ${updatedMaxMarks}.`
     );
   }
 
@@ -169,6 +177,12 @@ const updateMarkEntry = async (id, data) => {
         data.marks !== undefined
           ? Number(data.marks)
           : undefined,
+
+      maxMarks:
+        data.maxMarks !== undefined
+          ? Number(data.maxMarks)
+          : undefined,
+
       remarks: data.remarks,
       status: data.status,
     },

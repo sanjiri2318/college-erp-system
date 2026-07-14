@@ -18,6 +18,17 @@ const createExamType = async (data) => {
     data: {
       name: data.name,
       description: data.description,
+
+      isFinalExam: data.isFinalExam ?? false,
+
+      maxInternalMarks:
+        data.maxInternalMarks ?? 40,
+
+      maxExternalMarks:
+        data.maxExternalMarks ?? 60,
+
+      passMarks:
+        data.passMarks ?? 50,
     },
   });
 };
@@ -96,7 +107,18 @@ const updateExamType = async (id, data) => {
     where: {
       id: Number(id),
     },
-    data,
+    data: {
+      name: data.name,
+      description: data.description,
+
+      isFinalExam: data.isFinalExam,
+
+      maxInternalMarks: data.maxInternalMarks,
+
+      maxExternalMarks: data.maxExternalMarks,
+
+      passMarks: data.passMarks,
+    },
   });
 };
 

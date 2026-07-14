@@ -86,6 +86,16 @@ enum MarkEntryStatus {
   PUBLISHED
 }
 
+enum ResultStatus {
+  PASS
+  FAIL
+}
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model User {
   id                 Int      @id @default(autoincrement())
   email              String   @unique
@@ -132,6 +142,8 @@ model Student {
   bookIssues          BookIssue[]
   examSeatAllocations ExamSeatAllocation[]
   markEntries         MarkEntry[]
+  results             Result[]
+  semesterGPAs        SemesterGPA[]
 
   hostelAllocation HostelAllocation?
   transport        StudentTransport?
@@ -162,6 +174,8 @@ model Subject {
   name     String
   semester Int
 
+  credits Int @default(4)
+
   departmentId Int
   facultyId    Int?
 
@@ -173,6 +187,7 @@ model Subject {
   timetables    Timetable[]
   examSchedules ExamSchedule[]
   markEntries   MarkEntry[]
+  results       Result[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -196,9 +211,11 @@ model Attendance {
 }
 
 model InternalMark {
-  id             Int   @id @default(autoincrement())
+  id             Int @id @default(autoincrement())
   internalNumber Int
-  marksObtained  Float
+
+  marksObtained Float
+  maxMarks      Float @default(50)
 
   studentId Int
   subjectId Int
@@ -607,11 +624,18 @@ model ExamType {
   name        String  @unique
   description String?
 
-  examSchedules ExamSchedule[]
-  markEntries   MarkEntry[]
+  isFinalExam Boolean @default(false)
+
+  maxInternalMarks Int @default(40)
+  maxExternalMarks Int @default(60)
+  passMarks        Int @default(50)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  examSchedules ExamSchedule[]
+  markEntries   MarkEntry[]
+  results       Result[]
 }
 
 model ExamSchedule {
@@ -703,6 +727,7 @@ model MarkEntry {
   subjectId  Int
   facultyId  Int
   examTypeId Int
+  maxMarks   Int @default(100)
 
   marks Int
 
@@ -719,4 +744,61 @@ model MarkEntry {
   examType ExamType @relation(fields: [examTypeId], references: [id])
 
   @@unique([studentId, subjectId, examTypeId])
+}
+
+model Result {
+  id Int @id @default(autoincrement())
+
+  studentId  Int
+  subjectId  Int
+  examTypeId Int
+
+  internalMarks Float
+  externalMarks Float
+
+  totalMarks Float
+  percentage Float
+
+  grade      String
+  gradePoint Float  @default(0)
+
+  resultStatus ResultStatus
+
+  publishStatus PublishStatus @default(DRAFT)
+
+  remarks String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  examType ExamType @relation(fields: [examTypeId], references: [id])
+
+  @@unique([studentId, subjectId, examTypeId])
+}
+
+model SemesterGPA {
+  id Int @id @default(autoincrement())
+
+  studentId Int
+  semester  Int
+
+  academicYear String
+
+  totalCredits  Float
+  earnedCredits Float
+
+  totalGradePoints Float
+
+  gpa Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, semester, academicYear])
 }
