@@ -77,6 +77,7 @@ const hallTicketRoutes = require("./src/routes/exam/hallTicket.routes");
 const markEntryRoutes = require("./src/routes/exam/markEntry.routes");
 const resultRoutes = require("./src/routes/exam/result.routes");
 const semesterGPARoutes = require("./src/routes/exam/semesterGPA.routes");
+const cgpaRoutes = require("./src/routes/exam/cgpa.routes");
 
 app.use('/api/auth', authRoutes);
 app.use('/api/departments', departmentRoutes);
@@ -116,6 +117,7 @@ app.use("/api/hall-tickets", hallTicketRoutes);
 app.use("/api/mark-entries", markEntryRoutes);
 app.use("/api/results", resultRoutes);
 app.use("/api/semester-gpa", semesterGPARoutes);
+app.use("/api/cgpa", cgpaRoutes);
 
 
 // ── 404 Handler ───────────────────────────────────────────────────────────

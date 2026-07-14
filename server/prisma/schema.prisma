@@ -144,6 +144,7 @@ model Student {
   markEntries         MarkEntry[]
   results             Result[]
   semesterGPAs        SemesterGPA[]
+  cgpas               CGPA[]
 
   hostelAllocation HostelAllocation?
   transport        StudentTransport?
@@ -801,4 +802,25 @@ model SemesterGPA {
   student Student @relation(fields: [studentId], references: [id])
 
   @@unique([studentId, semester, academicYear])
+}
+
+model CGPA {
+  id Int @id @default(autoincrement())
+
+  studentId Int
+
+  academicYear String
+
+  totalCredits Float
+
+  earnedCredits Float
+
+  cgpa Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, academicYear])
 }
