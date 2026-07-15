@@ -38,6 +38,7 @@ const createCGPA = async (data) => {
       studentId,
       academicYear,
     },
+
     orderBy: {
       semester: "asc",
     },
@@ -51,26 +52,32 @@ const createCGPA = async (data) => {
 
   let totalCredits = 0;
   let earnedCredits = 0;
-  let totalGPA = 0;
+  let totalGradePoints = 0;
 
   for (const semester of semesterGPAs) {
     totalCredits += semester.totalCredits;
     earnedCredits += semester.earnedCredits;
-    totalGPA += semester.gpa;
+    totalGradePoints += semester.totalGradePoints;
   }
 
-  const cgpa = Number(
-    (
-      totalGPA / semesterGPAs.length
-    ).toFixed(2)
-  );
+  const cgpa =
+    totalCredits === 0
+      ? 0
+      : Number(
+          (
+            totalGradePoints /
+            totalCredits
+          ).toFixed(2)
+        );
 
   const cgpaRecord = await prisma.cGPA.create({
     data: {
       studentId,
       academicYear,
+
       totalCredits,
       earnedCredits,
+
       cgpa,
     },
 

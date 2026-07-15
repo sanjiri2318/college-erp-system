@@ -78,6 +78,8 @@ const markEntryRoutes = require("./src/routes/exam/markEntry.routes");
 const resultRoutes = require("./src/routes/exam/result.routes");
 const semesterGPARoutes = require("./src/routes/exam/semesterGPA.routes");
 const cgpaRoutes = require("./src/routes/exam/cgpa.routes");
+const transcriptRoutes = require("./src/routes/exam/transcript.routes");
+const academicRankRoutes = require("./src/routes/exam/academicRank.routes");
 
 app.use('/api/auth', authRoutes);
 app.use('/api/departments', departmentRoutes);
@@ -118,7 +120,8 @@ app.use("/api/mark-entries", markEntryRoutes);
 app.use("/api/results", resultRoutes);
 app.use("/api/semester-gpa", semesterGPARoutes);
 app.use("/api/cgpa", cgpaRoutes);
-
+app.use("/api/transcript", transcriptRoutes);
+app.use("/api/academic-ranks", academicRankRoutes);
 
 // ── 404 Handler ───────────────────────────────────────────────────────────
 

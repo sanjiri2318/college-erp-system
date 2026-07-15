@@ -7,29 +7,31 @@ const createCGPA = asyncHandler(async (req, res) => {
 
   return successResponse(
     res,
-    "CGPA generated successfully.",
     cgpa,
+    "CGPA generated successfully.",
     201
   );
 });
 
 const getAllCGPAs = asyncHandler(async (req, res) => {
-  const cgpas = await cgpaService.getAllCGPAs(req.query);
+  const cgpas =
+    await cgpaService.getAllCGPAs(req.query);
 
   return successResponse(
     res,
-    "CGPAs fetched successfully.",
-    cgpas
+    cgpas,
+    "CGPAs fetched successfully."
   );
 });
 
 const getCGPAById = asyncHandler(async (req, res) => {
-  const cgpa = await cgpaService.getCGPAById(req.params.id);
+  const cgpa =
+    await cgpaService.getCGPAById(req.params.id);
 
   return successResponse(
     res,
-    "CGPA fetched successfully.",
-    cgpa
+    cgpa,
+    "CGPA fetched successfully."
   );
 });
 

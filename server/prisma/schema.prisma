@@ -106,6 +106,8 @@ model User {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
+  auditLogs AuditLog[]
+
   student Student?
   faculty Faculty?
 }
@@ -145,6 +147,7 @@ model Student {
   results             Result[]
   semesterGPAs        SemesterGPA[]
   cgpas               CGPA[]
+  academicRanks       AcademicRank[]
 
   hostelAllocation HostelAllocation?
   transport        StudentTransport?
@@ -823,4 +826,49 @@ model CGPA {
   student Student @relation(fields: [studentId], references: [id])
 
   @@unique([studentId, academicYear])
+}
+
+model AcademicRank {
+  id Int @id @default(autoincrement())
+
+  studentId Int
+
+  semester Int?
+
+  academicYear String
+
+  cgpa Float
+
+  departmentRank Int
+
+  overallRank Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, semester, academicYear])
+}
+
+model AuditLog {
+  id Int @id @default(autoincrement())
+
+  userId Int
+
+  module String
+
+  action String
+
+  description String
+
+  ipAddress String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([module])
+  @@index([action])
+  @@index([createdAt])
 }
