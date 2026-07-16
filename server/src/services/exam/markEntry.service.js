@@ -34,6 +34,13 @@ const createMarkEntry = async (data) => {
     throw new NotFoundError("Faculty");
   }
 
+  // Faculty must teach this subject
+  if (subject.facultyId !== faculty.id) {
+    throw new ConflictError(
+      "Selected faculty is not assigned to this subject."
+    );
+  }
+
   const examType = await prisma.examType.findUnique({
     where: {
       id: Number(data.examTypeId),
@@ -61,6 +68,15 @@ const createMarkEntry = async (data) => {
   const marks = Number(data.marks);
   const maxMarks = Number(data.maxMarks ?? 100);
 
+  if (
+    Number.isNaN(marks) ||
+    Number.isNaN(maxMarks)
+  ) {
+    throw new ConflictError(
+      "Invalid marks."
+    );
+  }
+
   if (marks < 0 || marks > maxMarks) {
     throw new ConflictError(
       `Marks cannot exceed ${maxMarks}.`
@@ -87,25 +103,58 @@ const createMarkEntry = async (data) => {
 };
 
 const getAllMarkEntries = async (query) => {
-  const { page, limit, skip } = getPagination(query);
+  const { page, limit, skip } =
+    getPagination(query);
 
-  const [entries, total] = await Promise.all([
-    prisma.markEntry.findMany({
-      skip,
-      take: limit,
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        student: true,
-        subject: true,
-        faculty: true,
-        examType: true,
-      },
-    }),
+  const where = query.search
+    ? {
+        OR: [
+          {
+            student: {
+              name: {
+                contains: query.search,
+              },
+            },
+          },
+          {
+            subject: {
+              name: {
+                contains: query.search,
+              },
+            },
+          },
+          {
+            examType: {
+              name: {
+                contains: query.search,
+              },
+            },
+          },
+        ],
+      }
+    : {};
 
-    prisma.markEntry.count(),
-  ]);
+  const [entries, total] =
+    await Promise.all([
+      prisma.markEntry.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          student: true,
+          subject: true,
+          faculty: true,
+          examType: true,
+        },
+      }),
+
+      prisma.markEntry.count({
+        where,
+      }),
+    ]);
 
   return {
     data: entries,
@@ -113,41 +162,57 @@ const getAllMarkEntries = async (query) => {
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(
+        total / limit
+      ),
     },
   };
 };
 
-const getMarkEntryById = async (id) => {
-  const entry = await prisma.markEntry.findUnique({
-    where: {
-      id: Number(id),
-    },
-    include: {
-      student: true,
-      subject: true,
-      faculty: true,
-      examType: true,
-    },
-  });
+const getMarkEntryById = async (
+  id
+) => {
+  const entry =
+    await prisma.markEntry.findUnique({
+      where: {
+        id: Number(id),
+      },
+      include: {
+        student: true,
+        subject: true,
+        faculty: true,
+        examType: true,
+      },
+    });
 
   if (!entry) {
-    throw new NotFoundError("Mark Entry");
+    throw new NotFoundError(
+      "Mark Entry"
+    );
   }
 
   return entry;
 };
 
-const updateMarkEntry = async (id, data) => {
-  const existing = await getMarkEntryById(id);
+const updateMarkEntry = async (
+  id,
+  data
+) => {
+  const existing =
+    await getMarkEntryById(id);
 
-  if (existing.status === "LOCKED") {
+  if (
+    existing.status === "LOCKED"
+  ) {
     throw new ConflictError(
       "Locked mark entry cannot be edited."
     );
   }
 
-  if (existing.status === "PUBLISHED") {
+  if (
+    existing.status ===
+    "PUBLISHED"
+  ) {
     throw new ConflictError(
       "Published mark entry cannot be edited."
     );
@@ -161,7 +226,8 @@ const updateMarkEntry = async (id, data) => {
   if (
     data.marks !== undefined &&
     (Number(data.marks) < 0 ||
-      Number(data.marks) > updatedMaxMarks)
+      Number(data.marks) >
+        updatedMaxMarks)
   ) {
     throw new ConflictError(
       `Marks cannot exceed ${updatedMaxMarks}.`
@@ -184,6 +250,7 @@ const updateMarkEntry = async (id, data) => {
           : undefined,
 
       remarks: data.remarks,
+
       status: data.status,
     },
     include: {
@@ -195,10 +262,16 @@ const updateMarkEntry = async (id, data) => {
   });
 };
 
-const deleteMarkEntry = async (id) => {
-  const existing = await getMarkEntryById(id);
+const deleteMarkEntry = async (
+  id
+) => {
+  const existing =
+    await getMarkEntryById(id);
 
-  if (existing.status === "PUBLISHED") {
+  if (
+    existing.status ===
+    "PUBLISHED"
+  ) {
     throw new ConflictError(
       "Published mark entry cannot be deleted."
     );

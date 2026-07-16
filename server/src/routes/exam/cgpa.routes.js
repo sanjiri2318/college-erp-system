@@ -7,34 +7,30 @@ const {
 } = require("../../middlewares/auth.middleware");
 
 const {
-  validateCreateCGPA,
-} = require("../../validators/cgpa.validator");
-
-const {
-  createCGPA,
-  getAllCGPAs,
-  getCGPAById,
+  getStudentCGPA,
+  getMyCGPA,
 } = require("../../controllers/exam/cgpa.controller");
 
 router.use(verifyToken);
 
+/*
+ * Admin / Faculty
+ * View any student's GPA & CGPA
+ */
 router.get(
-  "/",
-  requireRole("ADMIN"),
-  getAllCGPAs
+  "/student/:studentId",
+  requireRole("ADMIN", "FACULTY"),
+  getStudentCGPA
 );
 
+/*
+ * Student
+ * View own GPA & CGPA
+ */
 router.get(
-  "/:id",
-  requireRole("ADMIN"),
-  getCGPAById
-);
-
-router.post(
-  "/",
-  requireRole("ADMIN"),
-  validateCreateCGPA,
-  createCGPA
+  "/me",
+  requireRole("STUDENT"),
+  getMyCGPA
 );
 
 module.exports = router;

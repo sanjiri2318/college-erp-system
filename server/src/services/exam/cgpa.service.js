@@ -132,7 +132,6 @@ const getCGPAById = async (id) => {
       student: true,
     },
   });
-
   if (!cgpa) {
     throw new NotFoundError("CGPA");
   }

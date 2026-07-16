@@ -19,6 +19,18 @@ const validateCreateResult = (req, res, next) => {
     );
   }
 
+  if (
+    isNaN(Number(studentId)) ||
+    isNaN(Number(subjectId)) ||
+    isNaN(Number(examTypeId))
+  ) {
+    return next(
+      new ValidationError(
+        "Invalid Student, Subject or Exam Type ID."
+      )
+    );
+  }
+
   next();
 };
 

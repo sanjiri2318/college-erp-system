@@ -16,6 +16,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Divider,
 } from "@mui/material";
 
 function GlassItem({ to, text }) {
@@ -28,8 +29,7 @@ function GlassItem({ to, text }) {
           borderRadius: "20px",
           color: "#222",
           "&:hover": {
-            background:
-              "rgba(255,255,255,0.45)",
+            background: "rgba(255,255,255,0.45)",
           },
         }}
       >
@@ -73,6 +73,7 @@ function DashboardLayout() {
       }}
     >
       {/* Navbar */}
+
       <AppBar
         position="fixed"
         elevation={0}
@@ -129,6 +130,7 @@ function DashboardLayout() {
       </AppBar>
 
       {/* Sidebar */}
+
       <Box
         sx={{
           width: 280,
@@ -151,13 +153,17 @@ function DashboardLayout() {
           }}
         >
           <List>
+
             {/* ADMIN */}
+
             {user?.role === "ADMIN" && (
               <>
                 <GlassItem
                   to="/admin"
                   text="Dashboard"
                 />
+
+                <Divider sx={{ my: 1 }} />
 
                 <GlassItem
                   to="/admin/students"
@@ -180,9 +186,31 @@ function DashboardLayout() {
                 />
 
                 <GlassItem
+                  to="/admin/exam-types"
+                  text="Exam Types"
+                />
+
+                <GlassItem
+                  to="/admin/exam-schedules"
+                  text="Exam Schedule"
+                />
+
+                <GlassItem
+                  to="/admin/mark-entries"
+                  text="Mark Entries"
+                />
+
+                <GlassItem
+                  to="/admin/results"
+                  text="Results"
+                />
+
+                <GlassItem
                   to="/admin/timetable"
                   text="Timetable"
                 />
+
+                <Divider sx={{ my: 1 }} />
 
                 <GlassItem
                   to="/profile"
@@ -197,6 +225,7 @@ function DashboardLayout() {
             )}
 
             {/* FACULTY */}
+
             {user?.role ===
               "FACULTY" && (
               <>
@@ -225,6 +254,8 @@ function DashboardLayout() {
                   text="My Timetable"
                 />
 
+                <Divider sx={{ my: 1 }} />
+
                 <GlassItem
                   to="/profile"
                   text="Profile"
@@ -238,6 +269,7 @@ function DashboardLayout() {
             )}
 
             {/* STUDENT */}
+
             {user?.role ===
               "STUDENT" && (
               <>
@@ -266,6 +298,8 @@ function DashboardLayout() {
                   text="Timetable"
                 />
 
+                <Divider sx={{ my: 1 }} />
+
                 <GlassItem
                   to="/profile"
                   text="Profile"
@@ -277,11 +311,13 @@ function DashboardLayout() {
                 />
               </>
             )}
+
           </List>
         </Paper>
       </Box>
 
       {/* Main Content */}
+
       <Box
         component="main"
         sx={{

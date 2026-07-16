@@ -12,6 +12,10 @@ import FacultyPage from "../pages/admin/FacultyPage";
 import DepartmentsPage from "../pages/admin/DepartmentsPage";
 import SubjectsPage from "../pages/admin/SubjectsPage";
 import TimetablePage from "../pages/admin/TimetablePage";
+import ExamTypesPage from "../pages/admin/ExamTypesPage";
+import ExamSchedulePage from "../pages/admin/ExamSchedulePage";
+import MarkEntryPage from "../pages/admin/MarkEntryPage";
+import ResultPage from "../pages/admin/ResultPage";
 
 // Faculty Pages
 import FacultyDashboard from "../pages/faculty/FacultyDashboard";
@@ -107,6 +111,42 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRole="ADMIN">
               <SubjectsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/exam-types"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <ExamTypesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/exam-schedules"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <ExamSchedulePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/mark-entries"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <MarkEntryPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/results"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <ResultPage />
             </ProtectedRoute>
           }
         />

@@ -7,6 +7,7 @@ const validateCreateMarkEntry = (req, res, next) => {
     facultyId,
     examTypeId,
     marks,
+    maxMarks,
   } = req.body;
 
   if (
@@ -23,10 +24,54 @@ const validateCreateMarkEntry = (req, res, next) => {
     );
   }
 
+  if (Number(marks) < 0) {
+    return next(
+      new ValidationError(
+        "Marks cannot be negative."
+      )
+    );
+  }
+
+  if (
+    maxMarks !== undefined &&
+    Number(marks) > Number(maxMarks)
+  ) {
+    return next(
+      new ValidationError(
+        "Marks cannot exceed maximum marks."
+      )
+    );
+  }
+
   next();
 };
 
 const validateUpdateMarkEntry = (req, res, next) => {
+  const { marks, maxMarks } = req.body;
+
+  if (
+    marks !== undefined &&
+    Number(marks) < 0
+  ) {
+    return next(
+      new ValidationError(
+        "Marks cannot be negative."
+      )
+    );
+  }
+
+  if (
+    marks !== undefined &&
+    maxMarks !== undefined &&
+    Number(marks) > Number(maxMarks)
+  ) {
+    return next(
+      new ValidationError(
+        "Marks cannot exceed maximum marks."
+      )
+    );
+  }
+
   next();
 };
 

@@ -13,6 +13,11 @@ const getAdminDashboard = async (req, res) => {
       totalSubjects,
       totalAttendanceRecords,
       totalInternalMarks,
+      totalResults,
+      totalPublishedResults,
+      totalSemesterGPAs,
+      totalCGPAs,
+      totalAcademicRanks,
     ] = await Promise.all([
       prisma.student.count(),
       prisma.faculty.count(),
@@ -20,6 +25,18 @@ const getAdminDashboard = async (req, res) => {
       prisma.subject.count(),
       prisma.attendance.count(),
       prisma.internalMark.count(),
+      prisma.result.count(),
+      prisma.result.count({
+        where: {
+          publishStatus: "PUBLISHED",
+        },
+      }),
+
+      prisma.semesterGPA.count(),
+
+      prisma.cGPA.count(),
+
+      prisma.academicRank.count(),
     ]);
 
     return res.status(200).json({
@@ -31,6 +48,11 @@ const getAdminDashboard = async (req, res) => {
         totalSubjects,
         totalAttendanceRecords,
         totalInternalMarks,
+        totalResults,
+        totalPublishedResults,
+        totalSemesterGPAs,
+        totalCGPAs,
+        totalAcademicRanks,
       },
     });
   } catch (error) {

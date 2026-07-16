@@ -194,8 +194,61 @@ const createResult = async (data) => {
 const getAllResults = async (query) => {
   const { page, limit, skip } = getPagination(query);
 
+  const where = query.search
+    ? {
+        OR: [
+          {
+            student: {
+              name: {
+                contains: query.search,
+              },
+            },
+          },
+          {
+            student: {
+              regNumber: {
+                contains: query.search,
+              },
+            },
+          },
+          {
+            subject: {
+              name: {
+                contains: query.search,
+              },
+            },
+          },
+          {
+            subject: {
+              code: {
+                contains: query.search,
+              },
+            },
+          },
+          {
+            examType: {
+              name: {
+                contains: query.search,
+              },
+            },
+          },
+          {
+            grade: {
+              contains: query.search,
+            },
+          },
+          {
+            resultStatus: {
+              contains: query.search,
+            },
+          },
+        ],
+      }
+    : {};
+
   const [results, total] = await Promise.all([
     prisma.result.findMany({
+      where,
       skip,
       take: limit,
       orderBy: {
@@ -208,7 +261,9 @@ const getAllResults = async (query) => {
       },
     }),
 
-    prisma.result.count(),
+    prisma.result.count({
+      where,
+    }),
   ]);
 
   return {
