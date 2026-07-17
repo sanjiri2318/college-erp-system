@@ -22,13 +22,13 @@ const createSemesterGPA = async (data) => {
   // Prevent Duplicate GPA
   const existing = await prisma.semesterGPA.findUnique({
     where: {
-        studentId_semester_academicYear: {
+      studentId_semester_academicYear: {
         studentId,
         semester,
         academicYear,
-        },
+      },
     },
-    });
+  });
 
   if (existing) {
     throw new ConflictError(
@@ -36,30 +36,32 @@ const createSemesterGPA = async (data) => {
     );
   }
 
-  // Fetch Published Results
+  // Fetch Published Final Exam Results
   const results = await prisma.result.findMany({
     where: {
-        studentId,
-        publishStatus: "PUBLISHED",
+      studentId,
+      publishStatus: "PUBLISHED",
 
-        examType: {
+      examType: {
         isFinalExam: true,
-        },
+      },
 
-        subject: {
+      subject: {
         semester,
-        },
+      },
+
+      // Uncomment if Result model has academicYear
+      // academicYear,
     },
 
     include: {
-        subject: true,
-        examType: true,
+      subject: true,
     },
 
     orderBy: {
-        subjectId: "asc",
+      subjectId: "asc",
     },
-    });
+  });
 
   if (results.length === 0) {
     throw new NotFoundError(
@@ -84,7 +86,7 @@ const createSemesterGPA = async (data) => {
       result.gradePoint * credits;
   }
 
-  const gpa =
+  const calculatedGPA =
     totalCredits === 0
       ? 0
       : Number(
@@ -105,7 +107,7 @@ const createSemesterGPA = async (data) => {
         earnedCredits,
         totalGradePoints,
 
-        gpa,
+        gpa: calculatedGPA,
       },
 
       include: {

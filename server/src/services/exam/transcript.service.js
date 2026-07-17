@@ -19,7 +19,7 @@ const getStudentTranscript = async (studentId) => {
     throw new NotFoundError("Student");
   }
 
-  // Fetch Semester GPAs
+  // Semester GPA
   const semesterGPAs = await prisma.semesterGPA.findMany({
     where: {
       studentId,
@@ -30,14 +30,18 @@ const getStudentTranscript = async (studentId) => {
     },
   });
 
-  // Fetch CGPA
+  // Latest CGPA
   const cgpa = await prisma.cGPA.findFirst({
     where: {
       studentId,
     },
+
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
-  // Fetch Published Final Results
+  // Published Final Results
   const results = await prisma.result.findMany({
     where: {
       studentId,
@@ -66,7 +70,6 @@ const getStudentTranscript = async (studentId) => {
     ],
   });
 
-  // Group Results Semester Wise
   const semesterMap = {};
 
   for (const result of results) {
@@ -104,10 +107,11 @@ const getStudentTranscript = async (studentId) => {
 
   return {
     student: {
-        id: student.id,
-        registerNumber: student.regNumber,
-        name: student.name,
-        department: student.department.name,
+      id: student.id,
+      registerNumber: student.regNumber,
+      name: student.name,
+      department: student.department.name,
+      currentSemester: student.semester,
     },
 
     semesters: Object.values(semesterMap),

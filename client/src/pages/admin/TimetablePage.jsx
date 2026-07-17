@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import API from "../../api/axios";
 
 import {
@@ -54,7 +54,7 @@ const DAY_COLOR = {
   SATURDAY: "#4e342e",
 };
 
-const EMPTY_FORM = {
+const createEmptyForm = () => ({
   day: "",
   period: "",
   roomNumber: "",
@@ -62,7 +62,7 @@ const EMPTY_FORM = {
   departmentId: "",
   subjectId: "",
   facultyId: "",
-};
+});
 
 const TABLE_HEAD_BG = "#1976d2";
 
@@ -77,20 +77,26 @@ const headerCellSx = {
   borderBottom: "none",
 };
 
-function TimetableFormBody({ formData, handleChange, departments, subjects, faculty }) {
+function TimetableFormBody({
+  formData,
+  handleChange,
+  departments,
+  subjects,
+  faculty,
+}) {
   return (
     <Grid container spacing={2.5} sx={{ mt: 0.5 }}>
-      {/* Row 1: Day | Period */}
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           select
           fullWidth
           label="Day"
           name="day"
-          value={formData.day}
+          value={formData.day ?? ""}
           onChange={handleChange}
           size="small"
         >
+          <MenuItem value="">Select Day</MenuItem>
           {DAY_OPTIONS.map((d) => (
             <MenuItem key={d.value} value={d.value}>
               {d.label}
@@ -104,20 +110,19 @@ function TimetableFormBody({ formData, handleChange, departments, subjects, facu
           fullWidth
           label="Period"
           name="period"
-          value={formData.period}
+          value={formData.period ?? ""}
           onChange={handleChange}
           size="small"
           placeholder="e.g. 1, 2, 3"
         />
       </Grid>
 
-      {/* Row 2: Room Number | Semester */}
       <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           fullWidth
           label="Room Number"
           name="roomNumber"
-          value={formData.roomNumber}
+          value={formData.roomNumber ?? ""}
           onChange={handleChange}
           size="small"
           placeholder="e.g. A101"
@@ -129,64 +134,64 @@ function TimetableFormBody({ formData, handleChange, departments, subjects, facu
           fullWidth
           label="Semester"
           name="semester"
-          value={formData.semester}
+          value={formData.semester ?? ""}
           onChange={handleChange}
           size="small"
           placeholder="e.g. 3"
         />
       </Grid>
 
-      {/* Row 3: Department */}
       <Grid size={12}>
         <TextField
           select
           fullWidth
           label="Department"
           name="departmentId"
-          value={formData.departmentId}
+          value={formData.departmentId ?? ""}
           onChange={handleChange}
           size="small"
         >
+          <MenuItem value="">Select Department</MenuItem>
           {departments.map((d) => (
-            <MenuItem key={d.id} value={d.id}>
+            <MenuItem key={d.id} value={String(d.id)}>
               {d.name}
             </MenuItem>
           ))}
         </TextField>
       </Grid>
 
-      {/* Row 4: Subject */}
       <Grid size={12}>
         <TextField
           select
           fullWidth
           label="Subject"
           name="subjectId"
-          value={formData.subjectId}
+          value={formData.subjectId ?? ""}
           onChange={handleChange}
           size="small"
         >
+          <MenuItem value="">Select Subject</MenuItem>
           {subjects.map((s) => (
-            <MenuItem key={s.id} value={s.id}>
+            <MenuItem key={s.id} value={String(s.id)}>
               {s.name}
             </MenuItem>
           ))}
         </TextField>
       </Grid>
 
-      {/* Row 5: Faculty */}
       <Grid size={12}>
         <TextField
           select
           fullWidth
           label="Faculty"
           name="facultyId"
-          value={formData.facultyId}
+          value={formData.facultyId ?? ""}
           onChange={handleChange}
           size="small"
         >
+          <MenuItem value="">Select Faculty</MenuItem>
           {faculty.map((f) => (
-            <MenuItem key={f.id} value={f.id}>
+            <MenuItem key={f.id} value={String(f.id)}>
               {f.name}
             </MenuItem>
           ))}
@@ -202,24 +207,45 @@ function TimetablePage() {
   const [subjects, setSubjects] = useState([]);
   const [faculty, setFaculty] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedTimetable, setSelectedTimetable] = useState(null);
 
-  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [formData, setFormData] = useState(createEmptyForm());
 
-  // Search & Filter state
   const [searchText, setSearchText] = useState("");
   const [filterDept, setFilterDept] = useState("");
+  const [filterSemester, setFilterSemester] = useState("");
+  const [filterFaculty, setFilterFaculty] = useState("");
+  const [filterSubject, setFilterSubject] = useState("");
 
-  // ─── Data Loaders ───────────────────────────────────────────────────────────
+  const scopedSubjects = useMemo(() => {
+    return subjects.filter((s) => {
+      const matchesDept = formData.departmentId
+        ? String(s.departmentId) === formData.departmentId
+        : true;
+      const matchesSemester = formData.semester
+        ? String(s.semester) === formData.semester
+        : true;
+      return matchesDept && matchesSemester;
+    });
+  }, [subjects, formData.departmentId, formData.semester]);
+
+  const scopedFaculty = useMemo(() => {
+    return faculty.filter((f) => {
+      return formData.departmentId
+        ? String(f.departmentId) === formData.departmentId
+        : true;
+    });
+  }, [faculty, formData.departmentId]);
 
   const loadTimetables = async () => {
     try {
       setLoading(true);
       const res = await API.get("/timetable");
-      setTimetables(res.data.data);
+      setTimetables(res.data.data || []);
     } catch (err) {
       console.log(err);
     } finally {
@@ -229,17 +255,17 @@ function TimetablePage() {
 
   const loadDepartments = async () => {
     const res = await API.get("/departments");
-    setDepartments(res.data.data.departments);
+    setDepartments(res.data.data.departments || []);
   };
 
   const loadSubjects = async () => {
     const res = await API.get("/subjects");
-    setSubjects(res.data.data.subjects);
+    setSubjects(res.data.data.subjects || []);
   };
 
   const loadFaculty = async () => {
     const res = await API.get("/faculty");
-    setFaculty(res.data.data.faculty);
+    setFaculty(res.data.data.faculty || []);
   };
 
   useEffect(() => {
@@ -249,92 +275,175 @@ function TimetablePage() {
     loadFaculty();
   }, []);
 
-  // ─── Handlers ───────────────────────────────────────────────────────────────
-
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value ?? "",
+      ...(name === "departmentId"
+        ? { subjectId: "", facultyId: "" }
+        : {}),
+      ...(name === "semester" ? { subjectId: "" } : {}),
+    }));
+  };
+
+  const resetFormData = () => {
+    setFormData(createEmptyForm());
   };
 
   const handleAdd = async () => {
+    if (
+      !formData.day ||
+      !formData.period ||
+      !formData.semester ||
+      !formData.departmentId ||
+      !formData.subjectId ||
+      !formData.facultyId
+    ) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
     try {
+      setSaving(true);
       await API.post("/timetable", formData);
       setOpen(false);
-      setFormData(EMPTY_FORM);
+      resetFormData();
       loadTimetables();
     } catch (err) {
-      alert(err.response?.data?.message);
+      alert(err.response?.data?.message || "Failed to create timetable entry.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const openEdit = (item) => {
     setSelectedTimetable(item);
     setFormData({
-      day: item.day,
-      period: item.period,
-      roomNumber: item.roomNumber,
-      semester: item.semester,
-      departmentId: item.departmentId,
-      subjectId: item.subjectId,
-      facultyId: item.facultyId,
+      day: item.day || "",
+      period: item.period ? String(item.period) : "",
+      roomNumber: item.roomNumber || "",
+      semester: item.semester ? String(item.semester) : "",
+      departmentId: item.departmentId ? String(item.departmentId) : "",
+      subjectId: item.subjectId ? String(item.subjectId) : "",
+      facultyId: item.facultyId ? String(item.facultyId) : "",
     });
     setEditOpen(true);
   };
 
   const handleUpdate = async () => {
+    if (!selectedTimetable) {
+      return;
+    }
+
+    if (
+      !formData.day ||
+      !formData.period ||
+      !formData.semester ||
+      !formData.departmentId ||
+      !formData.subjectId ||
+      !formData.facultyId
+    ) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
     try {
+      setSaving(true);
       await API.put(`/timetable/${selectedTimetable.id}`, formData);
       setEditOpen(false);
+      setSelectedTimetable(null);
+      resetFormData();
       loadTimetables();
     } catch (err) {
-      alert(err.response?.data?.message);
+      alert(err.response?.data?.message || "Failed to update timetable entry.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this timetable entry?")) return;
+    if (!window.confirm("Are you sure you want to delete this timetable entry?")) {
+      return;
+    }
+
     try {
       await API.delete(`/timetable/${id}`);
       loadTimetables();
     } catch (err) {
-      alert(err.response?.data?.message);
+      alert(err.response?.data?.message || "Failed to delete timetable entry.");
     }
   };
 
-  // ─── Filtered & Searched Data ────────────────────────────────────────────────
-
   const filteredTimetables = useMemo(() => {
     const q = searchText.toLowerCase().trim();
+
     return timetables.filter((t) => {
-      const matchesDept = filterDept ? t.departmentId === filterDept : true;
-      if (!matchesDept) return false;
-      if (!q) return true;
+      const matchesDept = filterDept ? String(t.departmentId) === filterDept : true;
+      const matchesSemester = filterSemester ? String(t.semester) === filterSemester : true;
+      const matchesFaculty = filterFaculty ? String(t.facultyId) === filterFaculty : true;
+      const matchesSubject = filterSubject ? String(t.subjectId) === filterSubject : true;
+
+      if (!matchesDept || !matchesSemester || !matchesFaculty || !matchesSubject) {
+        return false;
+      }
+
+      if (!q) {
+        return true;
+      }
+
       return (
         t.subject?.name?.toLowerCase().includes(q) ||
+        t.subject?.code?.toLowerCase().includes(q) ||
         t.faculty?.name?.toLowerCase().includes(q) ||
         t.roomNumber?.toLowerCase().includes(q) ||
-        t.day?.toLowerCase().includes(q)
+        t.day?.toLowerCase().includes(q) ||
+        t.department?.name?.toLowerCase().includes(q) ||
+        t.department?.code?.toLowerCase().includes(q) ||
+        String(t.period || "").includes(q) ||
+        String(t.semester || "").includes(q)
       );
     });
-  }, [timetables, searchText, filterDept]);
+  }, [
+    timetables,
+    searchText,
+    filterDept,
+    filterSemester,
+    filterFaculty,
+    filterSubject,
+  ]);
 
-  // ─── Dialog shared props ─────────────────────────────────────────────────────
+  const stats = useMemo(() => {
+    const uniqueDepartments = new Set(filteredTimetables.map((t) => t.departmentId));
+    const uniqueFaculty = new Set(filteredTimetables.map((t) => t.facultyId));
+    const uniqueSubjects = new Set(filteredTimetables.map((t) => t.subjectId));
+
+    return {
+      total: filteredTimetables.length,
+      departments: uniqueDepartments.size,
+      faculty: uniqueFaculty.size,
+      subjects: uniqueSubjects.size,
+    };
+  }, [filteredTimetables]);
 
   const dialogPaperProps = {
     sx: { borderRadius: 4, p: 1 },
   };
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
-
   return (
     <Box sx={{ px: { xs: 2, md: 3 }, py: 3, maxWidth: 1400, mx: "auto" }}>
-      {/* ── Page Header ── */}
       <Box
         display="flex"
         alignItems={{ xs: "flex-start", sm: "center" }}
         justifyContent="space-between"
-        flexDirection={{ xs: "column", sm: "row" }}
         gap={2}
         mb={3}
+        sx={{
+          flexDirection: {
+            xs: "column",
+            sm: "row",
+          },
+        }}
       >
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <Box
@@ -351,7 +460,11 @@ function TimetablePage() {
             <CalendarMonthIcon sx={{ color: "#fff", fontSize: 24 }} />
           </Box>
           <Box>
-            <Typography variant="h5" fontWeight={700} lineHeight={1.2} color="text.primary">
+            <Typography
+              variant="h5"
+              color="text.primary"
+              sx={{ fontWeight: 700, lineHeight: 1.2 }}
+            >
               Timetable Management
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -364,7 +477,7 @@ function TimetablePage() {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => {
-            setFormData(EMPTY_FORM);
+            resetFormData();
             setOpen(true);
           }}
           sx={{
@@ -381,7 +494,6 @@ function TimetablePage() {
         </Button>
       </Box>
 
-      {/* ── Card ── */}
       <Paper
         elevation={0}
         sx={{
@@ -391,7 +503,6 @@ function TimetablePage() {
           overflow: "hidden",
         }}
       >
-        {/* Card subheader: search + filter */}
         <Box
           sx={{
             px: 2.5,
@@ -407,44 +518,114 @@ function TimetablePage() {
         >
           <TextField
             size="small"
-            placeholder="Search subject, faculty, room, day…"
+            placeholder="Search subject, faculty, room, day..."
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            sx={{ minWidth: 280, flex: 1 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" color="action" />
-                </InputAdornment>
-              ),
+            sx={{ minWidth: 260, flex: 1 }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" color="action" />
+                  </InputAdornment>
+                ),
+              },
             }}
           />
 
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            useFlexGap
+            sx={{ flexWrap: "wrap" }}
+          >
             <FilterListIcon fontSize="small" color="action" />
+
             <TextField
               select
               size="small"
               label="Department"
               value={filterDept}
               onChange={(e) => setFilterDept(e.target.value)}
-              sx={{ minWidth: 200 }}
+              sx={{ minWidth: 180 }}
             >
-              <MenuItem value="">All Departments</MenuItem>
+              <MenuItem value="">All</MenuItem>
               {departments.map((d) => (
-                <MenuItem key={d.id} value={d.id}>
+                <MenuItem key={d.id} value={String(d.id)}>
                   {d.name}
                 </MenuItem>
               ))}
             </TextField>
-          </Stack>
 
-          <Typography variant="body2" color="text.secondary" sx={{ ml: "auto" }}>
-            {filteredTimetables.length} record{filteredTimetables.length !== 1 ? "s" : ""}
-          </Typography>
+            <TextField
+              select
+              size="small"
+              label="Semester"
+              value={filterSemester}
+              onChange={(e) => setFilterSemester(e.target.value)}
+              sx={{ minWidth: 130 }}
+            >
+              <MenuItem value="">All</MenuItem>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                <MenuItem key={sem} value={String(sem)}>
+                  Semester {sem}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
+              size="small"
+              label="Faculty"
+              value={filterFaculty}
+              onChange={(e) => setFilterFaculty(e.target.value)}
+              sx={{ minWidth: 180 }}
+            >
+              <MenuItem value="">All</MenuItem>
+              {faculty.map((f) => (
+                <MenuItem key={f.id} value={String(f.id)}>
+                  {f.name}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
+              size="small"
+              label="Subject"
+              value={filterSubject}
+              onChange={(e) => setFilterSubject(e.target.value)}
+              sx={{ minWidth: 180 }}
+            >
+              <MenuItem value="">All</MenuItem>
+              {subjects.map((s) => (
+                <MenuItem key={s.id} value={String(s.id)}>
+                  {s.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Stack>
         </Box>
 
-        {/* ── Table ── */}
+        <Box
+          sx={{
+            px: 2.5,
+            py: 1.25,
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            bgcolor: "#fcfcfc",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 1,
+          }}
+        >
+          <Chip label={`Records: ${stats.total}`} size="small" />
+          <Chip label={`Departments: ${stats.departments}`} size="small" />
+          <Chip label={`Faculty: ${stats.faculty}`} size="small" />
+          <Chip label={`Subjects: ${stats.subjects}`} size="small" />
+        </Box>
+
         <TableContainer>
           <Table sx={{ minWidth: 900 }}>
             <TableHead sx={{ bgcolor: TABLE_HEAD_BG }}>
@@ -465,7 +646,7 @@ function TimetablePage() {
                   <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
                     <CircularProgress size={36} thickness={4} />
                     <Typography variant="body2" color="text.secondary" mt={1.5}>
-                      Loading timetable data…
+                      Loading timetable data...
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -477,9 +658,9 @@ function TimetablePage() {
                       No Timetable Records Found
                     </Typography>
                     <Typography variant="body2" color="text.disabled" mt={0.5}>
-                      {searchText || filterDept
-                        ? "Try adjusting your search or filter."
-                        : "Click \"Add Timetable\" to create the first entry."}
+                      {searchText || filterDept || filterSemester || filterFaculty || filterSubject
+                        ? "Try adjusting your search or filters."
+                        : 'Click "Add Timetable" to create the first entry.'}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -531,13 +712,13 @@ function TimetablePage() {
 
                     <TableCell>
                       <Typography variant="body2" fontWeight={600} color="text.primary">
-                        {t.subject?.name ?? "—"}
+                        {t.subject?.name ?? "-"}
                       </Typography>
                     </TableCell>
 
                     <TableCell>
                       <Typography variant="body2" color="text.secondary">
-                        {t.faculty?.name ?? "—"}
+                        {t.faculty?.name ?? "-"}
                       </Typography>
                     </TableCell>
 
@@ -553,7 +734,7 @@ function TimetablePage() {
                           display: "inline-block",
                         }}
                       >
-                        {t.roomNumber ?? "—"}
+                        {t.roomNumber ?? "-"}
                       </Typography>
                     </TableCell>
 
@@ -565,7 +746,7 @@ function TimetablePage() {
 
                     <TableCell>
                       <Typography variant="body2" color="text.secondary">
-                        {t.department?.code ?? "—"}
+                        {t.department?.code ?? "-"}
                       </Typography>
                     </TableCell>
 
@@ -610,13 +791,12 @@ function TimetablePage() {
         </TableContainer>
       </Paper>
 
-      {/* ── Add Dialog ── */}
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
         fullWidth
         maxWidth="md"
-        PaperProps={dialogPaperProps}
+        slotProps={{ paper: dialogPaperProps }}
       >
         <DialogTitle sx={{ pb: 0.5 }}>
           <Stack direction="row" alignItems="center" spacing={1}>
@@ -637,8 +817,8 @@ function TimetablePage() {
             formData={formData}
             handleChange={handleChange}
             departments={departments}
-            subjects={subjects}
-            faculty={faculty}
+            subjects={scopedSubjects}
+            faculty={scopedFaculty}
           />
         </DialogContent>
 
@@ -654,6 +834,7 @@ function TimetablePage() {
           <Button
             variant="contained"
             onClick={handleAdd}
+            disabled={saving}
             sx={{
               borderRadius: 2,
               textTransform: "none",
@@ -666,13 +847,12 @@ function TimetablePage() {
         </DialogActions>
       </Dialog>
 
-      {/* ── Edit Dialog ── */}
       <Dialog
         open={editOpen}
         onClose={() => setEditOpen(false)}
         fullWidth
         maxWidth="md"
-        PaperProps={dialogPaperProps}
+        slotProps={{ paper: dialogPaperProps }}
       >
         <DialogTitle sx={{ pb: 0.5 }}>
           <Stack direction="row" alignItems="center" spacing={1}>
@@ -693,8 +873,8 @@ function TimetablePage() {
             formData={formData}
             handleChange={handleChange}
             departments={departments}
-            subjects={subjects}
-            faculty={faculty}
+            subjects={scopedSubjects}
+            faculty={scopedFaculty}
           />
         </DialogContent>
 
@@ -710,6 +890,7 @@ function TimetablePage() {
           <Button
             variant="contained"
             onClick={handleUpdate}
+            disabled={saving}
             sx={{
               borderRadius: 2,
               textTransform: "none",

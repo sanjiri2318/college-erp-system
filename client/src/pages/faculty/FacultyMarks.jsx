@@ -136,7 +136,9 @@ const FacultyMarks = () => {
       <Box
         display="flex"
         gap={3}
-        flexWrap="wrap"
+        sx={{
+          flexWrap: "wrap",
+        }}
       >
         <FormControl
           sx={{ minWidth: 250 }}
@@ -252,9 +254,11 @@ const FacultyMarks = () => {
                                 .id
                             ] || ""
                           }
-                          inputProps={{
-                            min: 0,
-                            max: 100,
+                          slotProps={{
+                            htmlInput: {
+                              min: 0,
+                              max: 100,
+                            },
                           }}
                           onChange={(
                             e

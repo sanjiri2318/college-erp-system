@@ -206,6 +206,87 @@ function DashboardLayout() {
                 />
 
                 <GlassItem
+                  to="/admin/semester-gpa"
+                  text="Semester GPA"
+                />
+
+                <GlassItem
+                  to="/admin/cgpa"
+                  text="CGPA"
+                />
+
+                <GlassItem
+                  to="/admin/transcript"
+                  text="Transcript"
+                />
+
+                {/* NEW MENU */}
+                <GlassItem
+                  to="/admin/academic-rank"
+                  text="Academic Rank"
+                />
+
+                <GlassItem
+                  to="/admin/hostels"
+                  text="Hostels"
+                />
+
+                <GlassItem
+                  to="/admin/hostel-blocks"
+                  text="Hostel Blocks"
+                />
+
+                <GlassItem
+                  to="/admin/hostel-rooms"
+                  text="Hostel Rooms"
+                />
+
+                <GlassItem
+                  to="/admin/hostel-beds"
+                  text="Hostel Beds"
+                />
+
+                <GlassItem
+                  to="/admin/hostel-allocations"
+                  text="Hostel Allocations"
+                />
+
+                <GlassItem
+                  to="/admin/hostel-beds"
+                  text="Hostel Beds"
+                />
+
+                <GlassItem
+                  to="/admin/fee-categories"
+                  text="Fee Categories"
+                />
+
+                <GlassItem
+                  to="/admin/fee-structures"
+                  text="Fee Structures"
+                />
+
+                <GlassItem
+                  to="/admin/student-fees"
+                  text="Student Fees"
+                />
+
+                <GlassItem
+                  to="/admin/fee-payments"
+                  text="Fee Payments"
+                />
+
+                <GlassItem
+                  to="/admin/authors"
+                  text="Authors"
+                />
+
+                <GlassItem
+                  to="/admin/publishers"
+                  text="Publishers"
+                />
+
+                <GlassItem
                   to="/admin/timetable"
                   text="Timetable"
                 />

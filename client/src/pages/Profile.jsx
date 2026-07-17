@@ -72,9 +72,11 @@ function Profile() {
         {/* Avatar */}
         <Box
           display="flex"
-          flexDirection="column"
-          alignItems="center"
           mb={5}
+          sx={{
+            flexDirection: "column",
+            alignItems: "center",
+          }}
         >
           <Avatar
             sx={{
@@ -104,7 +106,7 @@ function Profile() {
 
         <Grid container spacing={4}>
           {/* Email */}
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Typography
               variant="body2"
               color="text.secondary"
@@ -118,7 +120,7 @@ function Profile() {
           </Grid>
 
           {/* Role */}
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Typography
               variant="body2"
               color="text.secondary"
@@ -134,7 +136,7 @@ function Profile() {
           {/* STUDENT */}
           {profile.role === "STUDENT" && (
             <>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -147,7 +149,7 @@ function Profile() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -160,7 +162,7 @@ function Profile() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -173,7 +175,7 @@ function Profile() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -186,7 +188,7 @@ function Profile() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -204,7 +206,7 @@ function Profile() {
           {/* FACULTY */}
           {profile.role === "FACULTY" && (
             <>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -217,7 +219,7 @@ function Profile() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -230,7 +232,7 @@ function Profile() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -247,7 +249,7 @@ function Profile() {
 
           {/* ADMIN */}
           {profile.role === "ADMIN" && (
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Typography
                 variant="body2"
                 color="text.secondary"

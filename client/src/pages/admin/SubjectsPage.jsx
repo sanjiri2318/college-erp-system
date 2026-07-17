@@ -23,6 +23,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useEffect, useState } from "react";
 import API from "../../api/axios";
 
+const createEmptyFormData = () => ({
+  code: "",
+  name: "",
+  semester: "",
+  departmentId: "",
+  facultyId: "",
+});
+
 function SubjectsPage() {
   const [subjects, setSubjects] =
     useState([]);
@@ -43,13 +51,7 @@ function SubjectsPage() {
     useState(null);
 
   const [formData, setFormData] =
-    useState({
-      code: "",
-      name: "",
-      semester: "",
-      departmentId: "",
-      facultyId: "",
-    });
+    useState(createEmptyFormData());
 
   const loadSubjects = async () => {
     try {
@@ -104,11 +106,16 @@ function SubjectsPage() {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]:
-        e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value ?? "",
+    }));
+  };
+
+  const resetFormData = () => {
+    setFormData(createEmptyFormData());
   };
 
   const handleAdd =
@@ -121,13 +128,7 @@ function SubjectsPage() {
 
         setOpen(false);
 
-        setFormData({
-          code: "",
-          name: "",
-          semester: "",
-          departmentId: "",
-          facultyId: "",
-        });
+        resetFormData();
 
         loadSubjects();
       } catch (err) {
@@ -144,12 +145,13 @@ function SubjectsPage() {
     );
 
     setFormData({
-      code: subject.code,
-      name: subject.name,
+      code: subject.code || "",
+      name: subject.name || "",
       semester:
-        subject.semester,
+        subject.semester || "",
       departmentId:
-        subject.departmentId,
+        subject.departmentId ||
+        "",
       facultyId:
         subject.facultyId ||
         "",
@@ -218,9 +220,10 @@ function SubjectsPage() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() =>
-            setOpen(true)
-          }
+          onClick={() => {
+            resetFormData();
+            setOpen(true);
+          }}
         >
           Add Subject
         </Button>
@@ -403,9 +406,8 @@ function SubjectsPage() {
             label="Code"
             name="code"
             fullWidth
-            onChange={
-              handleChange
-            }
+            value={formData.code}
+            onChange={handleChange}
           />
 
           <TextField
@@ -413,6 +415,7 @@ function SubjectsPage() {
             label="Name"
             name="name"
             fullWidth
+            value={formData.name}
             onChange={
               handleChange
             }
@@ -423,6 +426,7 @@ function SubjectsPage() {
             label="Semester"
             name="semester"
             fullWidth
+            value={formData.semester}
             onChange={
               handleChange
             }
@@ -434,6 +438,7 @@ function SubjectsPage() {
             label="Department"
             name="departmentId"
             fullWidth
+            value={formData.departmentId}
             onChange={
               handleChange
             }
@@ -456,6 +461,7 @@ function SubjectsPage() {
             label="Faculty"
             name="facultyId"
             fullWidth
+            value={formData.facultyId}
             onChange={
               handleChange
             }

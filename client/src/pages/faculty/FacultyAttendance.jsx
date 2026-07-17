@@ -148,8 +148,10 @@ const FacultyAttendance = () => {
         onChange={(e) =>
           setDate(e.target.value)
         }
-        InputLabelProps={{
-          shrink: true,
+        slotProps={{
+          inputLabel: {
+            shrink: true,
+          },
         }}
       />
 

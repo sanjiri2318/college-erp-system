@@ -22,6 +22,7 @@ const generateAcademicRanks = async (data) => {
     where: {
       academicYear,
     },
+
     include: {
       student: {
         include: {
@@ -29,40 +30,83 @@ const generateAcademicRanks = async (data) => {
         },
       },
     },
+
     orderBy: {
       cgpa: "desc",
     },
   });
 
   if (cgpas.length === 0) {
-    throw new NotFoundError("CGPA Records");
+    throw new NotFoundError(
+      "CGPA Records"
+    );
   }
 
   const departmentRanks = {};
 
-  const createdRanks = [];
+  const createdRanks = await prisma.$transaction(
+    async (tx) => {
+      const ranks = [];
 
-  for (let i = 0; i < cgpas.length; i++) {
-    const record = cgpas[i];
+      for (let i = 0; i < cgpas.length; i++) {
+        const record = cgpas[i];
 
-    const departmentId = record.student.departmentId;
+        const departmentId =
+          record.student.departmentId;
 
-    if (!departmentRanks[departmentId]) {
-      departmentRanks[departmentId] = 1;
+        if (!departmentRanks[departmentId]) {
+          departmentRanks[departmentId] = 1;
+        }
+
+        const academicRank =
+          await tx.academicRank.create({
+            data: {
+              studentId: record.studentId,
+              academicYear,
+
+              cgpa: record.cgpa,
+
+              departmentRank:
+                departmentRanks[
+                  departmentId
+                ],
+
+              overallRank: i + 1,
+            },
+
+            include: {
+              student: {
+                include: {
+                  department: true,
+                },
+              },
+            },
+          });
+
+        departmentRanks[departmentId]++;
+
+        ranks.push(academicRank);
+      }
+
+      return ranks;
     }
+  );
 
-    const academicRank =
-      await prisma.academicRank.create({
-        data: {
-          studentId: record.studentId,
-          academicYear,
+  return createdRanks;
+};
 
-          cgpa: record.cgpa,
+const getAllAcademicRanks = async (query) => {
+  const { page, limit, skip } =
+    getPagination(query);
 
-          departmentRank:
-            departmentRanks[departmentId],
+  const [ranks, total] =
+    await Promise.all([
+      prisma.academicRank.findMany({
+        skip,
+        take: limit,
 
-          overallRank: i + 1,
+        orderBy: {
+          overallRank: "asc",
         },
 
         include: {
@@ -72,40 +116,10 @@ const generateAcademicRanks = async (data) => {
             },
           },
         },
-      });
+      }),
 
-    departmentRanks[departmentId]++;
-
-    createdRanks.push(academicRank);
-  }
-
-  return createdRanks;
-};
-
-const getAllAcademicRanks = async (query) => {
-  const { page, limit, skip } =
-    getPagination(query);
-
-  const [ranks, total] = await Promise.all([
-    prisma.academicRank.findMany({
-      skip,
-      take: limit,
-
-      orderBy: {
-        overallRank: "asc",
-      },
-
-      include: {
-        student: {
-          include: {
-            department: true,
-          },
-        },
-      },
-    }),
-
-    prisma.academicRank.count(),
-  ]);
+      prisma.academicRank.count(),
+    ]);
 
   return {
     data: ranks,
@@ -114,7 +128,9 @@ const getAllAcademicRanks = async (query) => {
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(
+        total / limit
+      ),
     },
   };
 };

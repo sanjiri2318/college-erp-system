@@ -17,13 +17,14 @@ import {
   DialogActions,
   TextField,
   MenuItem,
-  Grid,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
+import Grid from "@mui/material/Grid";
 
 function FacultyPage() {
   const [faculty, setFaculty] = useState([]);
@@ -202,7 +203,7 @@ function FacultyPage() {
       const matchesDepartment =
         !departmentFilter ||
         f.departmentId ===
-          departmentFilter;
+          Number(departmentFilter);
 
       return (
         matchesSearch &&
@@ -258,15 +259,14 @@ function FacultyPage() {
                 e.target.value
               )
             }
-            InputProps={{
-              startAdornment: (
-                <SearchIcon
-                  sx={{
-                    mr: 1,
-                    color: "gray",
-                  }}
-                />
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon color="action" />
+                  </InputAdornment>
+                ),
+              },
             }}
           />
         </Grid>
@@ -461,6 +461,7 @@ function FacultyPage() {
             label="Name"
             name="name"
             fullWidth
+            value={formData.name || ""}
             onChange={handleChange}
           />
 
@@ -469,6 +470,7 @@ function FacultyPage() {
             label="Email"
             name="email"
             fullWidth
+            value={formData.email || ""}
             onChange={handleChange}
           />
 
@@ -478,6 +480,7 @@ function FacultyPage() {
             label="Department"
             name="departmentId"
             fullWidth
+            value={formData.departmentId || ""}
             onChange={handleChange}
           >
             {departments.map((d) => (
@@ -538,10 +541,7 @@ function FacultyPage() {
             label="Department"
             name="departmentId"
             fullWidth
-            value={
-              formData.departmentId ||
-              ""
-            }
+            value={formData.departmentId || ""}
             onChange={handleChange}
           >
             {departments.map((d) => (

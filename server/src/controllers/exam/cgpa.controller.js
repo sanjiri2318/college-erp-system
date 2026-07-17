@@ -2,45 +2,41 @@ const cgpaService = require("../../services/exam/cgpa.service");
 const asyncHandler = require("../../utils/asyncHandler");
 const { successResponse } = require("../../utils/apiResponse");
 
-const getStudentCGPA = asyncHandler(async (req, res) => {
-  const result = await cgpaService.getStudentCGPA(
-    req.params.studentId
-  );
+const createCGPA = asyncHandler(async (req, res) => {
+  const cgpa = await cgpaService.createCGPA(req.body);
 
   return successResponse(
     res,
-    result,
-    "CGPA fetched successfully."
+    cgpa,
+    "CGPA generated successfully.",
+    201
   );
 });
 
-const getMyCGPA = asyncHandler(async (req, res) => {
-  let studentId;
-
-  if (req.user.studentId) {
-    studentId = req.user.studentId;
-  } else {
-    const student =
-      await cgpaService.getStudentByUserId(
-        req.user.id
-      );
-
-    studentId = student.id;
-  }
-
-  const result =
-    await cgpaService.getStudentCGPA(
-      studentId
-    );
+const getAllCGPAs = asyncHandler(async (req, res) => {
+  const cgpas = await cgpaService.getAllCGPAs(req.query);
 
   return successResponse(
     res,
-    result,
+    cgpas,
+    "CGPAs fetched successfully."
+  );
+});
+
+const getCGPAById = asyncHandler(async (req, res) => {
+  const cgpa = await cgpaService.getCGPAById(
+    req.params.id
+  );
+
+  return successResponse(
+    res,
+    cgpa,
     "CGPA fetched successfully."
   );
 });
 
 module.exports = {
-  getStudentCGPA,
-  getMyCGPA,
+  createCGPA,
+  getAllCGPAs,
+  getCGPAById,
 };

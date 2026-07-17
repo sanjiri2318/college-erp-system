@@ -11,6 +11,11 @@ const {
 } = require("../controllers/timetable.controller");
 
 const {
+  validateCreateTimetable,
+  validateUpdateTimetable,
+} = require("../validators/timetable.validator");
+
+const {
   verifyToken,
   requireRole,
 } = require("../middlewares/auth.middleware");
@@ -24,6 +29,7 @@ router.use(verifyToken);
 router.post(
   "/",
   requireRole("ADMIN"),
+  validateCreateTimetable,
   createTimetable
 );
 
@@ -36,6 +42,7 @@ router.get(
 router.put(
   "/:id",
   requireRole("ADMIN"),
+  validateUpdateTimetable,
   updateTimetable
 );
 
